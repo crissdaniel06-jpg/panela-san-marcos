@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar pedido | Panela San Marcos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+    <header class="site-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio">
+                <img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li>
+                        <a href="index.html#historia">Nosotros</a>
+                    </li>
+
+                    <li><a href="ayuda.html">Ayuda</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button type="button" class="search-button" data-search-toggle aria-label="Buscar" aria-expanded="false" aria-controls="header-search-panel">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                    Buscar
+                </button>
+                <a href="carrito.html" class="cart-button">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    Carrito <span class="cart-count" aria-live="polite">(0)</span>
+                </a>
+            </div>
+        </div>
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+            <div class="container header-search-container">
+                <form id="header-search-form" role="search">
+                    <label for="header-product-search">Buscar productos</label>
+                    <div class="header-search-controls">
+                        <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off">
+                        <button type="button" class="header-search-close" id="header-search-close">Cerrar</button>
+                    </div>
+                </form>
+                <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe el nombre de un producto.</p>
+                <ul id="header-search-results" class="header-search-results"></ul>
+                <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+            </div>
+        </section>
+    </header>
+
+    <main id="main-content">
+        <section class="page-intro">
+            <div class="container">
+                <span class="section-tag">TU COMPRA</span>
+                <h1>Finalizar pedido</h1>
+            </div>
+        </section>
+
+        <section class="container checkout-section" aria-label="Datos y resumen del pedido">
+            <div id="checkout-empty" class="empty-state" hidden>
+                <h2>Tu carrito está vacío</h2>
+                <p>Agrega algunos productos antes de continuar con tu pedido.</p>
+                <a href="productos.html" class="action-button">Ver productos</a>
+            </div>
+
+            <div id="checkout-content" hidden>
+                <form id="checkout-form" class="checkout-layout" novalidate>
+                    <section class="checkout-form" aria-labelledby="checkout-contact-title">
+                        <h2 id="checkout-contact-title">Datos de contacto y entrega</h2>
+                        <p class="checkout-login-prompt" data-checkout-guest>¿Ya tienes una cuenta? <a href="login.html?return=checkout.html">Iniciar sesión</a>. También puedes continuar como invitado.</p>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="first-name">Nombre</label>
+                                <input id="first-name" name="nombre" type="text" autocomplete="given-name" required aria-describedby="error-first-name">
+                                <span class="field-error" id="error-first-name"></span>
+                            </div>
+                            <div class="form-field">
+                                <label for="last-name">Apellido</label>
+                                <input id="last-name" name="apellido" type="text" autocomplete="family-name" required aria-describedby="error-last-name">
+                                <span class="field-error" id="error-last-name"></span>
+                            </div>
+                            <div class="form-field">
+                                <label for="phone">Teléfono</label>
+                                <input id="phone" name="telefono" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="error-phone">
+                                <span class="field-error" id="error-phone"></span>
+                            </div>
+                            <div class="form-field">
+                                <label for="email">Correo electrónico</label>
+                                <input id="email" name="correo" type="email" autocomplete="email" required aria-describedby="error-email">
+                                <span class="field-error" id="error-email"></span>
+                            </div>
+                            <div class="form-field form-field-full">
+                                <label for="city">Ciudad / destino</label>
+                                <select id="city" name="ciudad" required aria-required="true" aria-describedby="error-city">
+                                    <option value="" selected>Selecciona una ciudad</option>
+                                    <option value="Pacto">Pacto</option>
+                                    <option value="Quito">Quito</option>
+                                    <option value="Cumbayá">Cumbayá</option>
+                                    <option value="Tumbaco">Tumbaco</option>
+                                </select>
+                                <span class="field-error" id="error-city"></span>
+                            </div>
+                            <div class="form-field form-field-full">
+                                <label for="address">Dirección de entrega</label>
+                                <input id="address" name="direccion" type="text" autocomplete="street-address" required aria-describedby="error-address">
+                                <span class="field-error" id="error-address"></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside class="order-summary" aria-labelledby="checkout-summary-title">
+                        <h2 id="checkout-summary-title">Resumen del pedido</h2>
+                        <ul id="checkout-items" class="checkout-items"></ul>
+                        <dl class="summary-lines">
+                            <div><dt>Subtotal</dt><dd id="checkout-subtotal"></dd></div>
+                            <div id="checkout-destination-row" hidden><dt>Destino</dt><dd id="checkout-destination"></dd></div>
+                            <div><dt>Envío</dt><dd id="checkout-shipping">—</dd></div>
+                            <div class="summary-total"><dt>Total</dt><dd id="checkout-total"></dd></div>
+                        </dl>
+                        <p id="shipping-status" class="visually-hidden" role="status" aria-live="polite"></p>
+                    </aside>
+
+                    <fieldset class="payment-options">
+                        <legend>Método de pago</legend>
+                        <label class="radio-option" for="payment-transfer">
+                            <input id="payment-transfer" name="metodoPago" type="radio" value="Transferencia bancaria" required aria-describedby="error-payment">
+                            <span>Transferencia bancaria</span>
+                        </label>
+                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden></p>
+                        <label class="radio-option" for="payment-delivery">
+                            <input id="payment-delivery" name="metodoPago" type="radio" value="Pago contra entrega" required aria-describedby="error-payment">
+                            <span>Pago contra entrega</span>
+                        </label>
+                        <span class="field-error" id="error-payment"></span>
+                    </fieldset>
+
+                    <div class="checkout-form-actions">
+                        <p class="form-feedback" id="checkout-feedback" role="alert" aria-live="assertive"></p>
+                        <button type="submit" class="action-button">Confirmar pedido</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <section aria-labelledby="footer-brand-title">
+                <h2 id="footer-brand-title">Panela San Marcos</h2>
+                <p>Desde El Paraíso - Pacto</p>
+                <p>Pacto - El Paraíso, Quito, Ecuador</p>
+                <p><a href="tel:0979509568">097 950 9568</a></p>
+                <p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p>
+            </section>
+            <section aria-labelledby="footer-social-title">
+                <h2 id="footer-social-title">Síguenos</h2>
+                <ul class="footer-social-links">
+                    <li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                </ul>
+            </section>
+            <p class="footer-copyright">© 2026 Panela San Marcos</p>
+        </div>
+    </footer>
+
+    <script src="js/productos.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+
+</html>

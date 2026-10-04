@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panela San Marcos</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+    <!-- ENCABEZADO -->
+    <header class="site-header">
+
+        <div class="container header-container">
+
+            <!-- LOGO -->
+            <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio">
+                <img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos">
+            </a>
+
+            <!-- NAVEGACIÓN -->
+            <nav class="main-nav" aria-label="Navegación principal">
+
+                <ul>
+                    <li>
+                        <a href="index.html">Inicio</a>
+                    </li>
+
+                    <li>
+                        <a href="productos.html">Productos</a>
+                    </li>
+
+                    <li>
+                        <a href="index.html#historia">Nosotros</a>
+                    </li>
+
+                    <li><a href="ayuda.html">Ayuda</a></li>
+                </ul>
+
+            </nav>
+
+            <!-- ACCIONES -->
+            <div class="header-actions">
+
+                <button type="button" class="search-button" data-search-toggle aria-label="Buscar" aria-expanded="false" aria-controls="header-search-panel">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                    Buscar
+                </button>
+
+                <a href="carrito.html" class="cart-button">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    Carrito <span class="cart-count" aria-live="polite">(0)</span>
+                </a>
+
+            </div>
+
+        </div>
+
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+            <div class="container header-search-container">
+                <form id="header-search-form" role="search">
+                    <label for="header-product-search">Buscar productos</label>
+                    <div class="header-search-controls">
+                        <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off">
+                        <button type="button" class="header-search-close" id="header-search-close">Cerrar</button>
+                    </div>
+                </form>
+                <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe el nombre de un producto.</p>
+                <ul id="header-search-results" class="header-search-results"></ul>
+                <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+            </div>
+        </section>
+
+    </header>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="main-content">
+
+        <section class="hero">
+
+            <div class="container hero-container">
+
+                <!-- CONTENIDO DEL HERO -->
+                <div class="hero-content">
+
+                    <span class="hero-tag">
+                        PANELA SAN MARCOS
+                    </span>
+
+                    <h1>
+                        El sabor natural de la caña de azúcar
+                    </h1>
+
+                    <p>
+                        Descubre nuestra panela 100% orgánica,
+                        elaborada de manera artesanal y con la
+                        tradición de varias generaciones.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a href="productos.html" class="hero-primary-button">
+                            Ver productos
+                        </a>
+
+                        <a href="#historia" class="hero-secondary-button">
+                            Conocer la marca
+                        </a>
+
+                    </div>
+
+                    <a href="#categorias" class="hero-scroll-hint">
+                        <span>Explora nuestros productos</span>
+                        <span aria-hidden="true">↓</span>
+                    </a>
+
+                </div>
+
+
+                <!-- IMAGEN DEL HERO -->
+                <div class="hero-image">
+
+                    <img src="img/hero-panela.png" alt="Productos de Panela San Marcos en un entorno natural">
+
+                </div>
+
+            </div>
+        </section>
+        <!-- ========================================
+        CATEGORÍAS
+        ======================================== -->
+
+        <section id="categorias" class="categories">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <span class="section-tag">
+                        NUESTROS PRODUCTOS
+                    </span>
+
+                    <h2>
+                        Explora nuestras categorías
+                    </h2>
+
+                    <p>
+                        Encuentra productos derivados de la caña
+                        de azúcar para diferentes gustos y usos.
+                    </p>
+
+                </div>
+
+
+                <div class="categories-grid">
+
+                    <!-- CATEGORÍA: PANELA -->
+                    <a href="productos.html?categoria=panela" class="category-card category-panela">
+
+                        <div class="category-icon" aria-hidden="true">
+                            🍯
+                        </div>
+
+                        <h3>
+                            Panela
+                        </h3>
+
+                        <p>
+                            Nuestra panela en diferentes presentaciones.
+                        </p>
+
+                        <span class="category-link">
+                            Ver productos →
+                        </span>
+
+                    </a>
+
+
+                    <!-- CATEGORÍA: SABORIZADOS -->
+                    <a href="productos.html?categoria=saborizados" class="category-card category-saborizados">
+
+                        <div class="category-icon" aria-hidden="true">
+                            🌿
+                        </div>
+
+                        <h3>
+                            Saborizados
+                        </h3>
+
+                        <p>
+                            Panela combinada con sabores naturales.
+                        </p>
+
+                        <span class="category-link">
+                            Ver productos →
+                        </span>
+
+                    </a>
+
+
+                    <!-- CATEGORÍA: DERIVADOS -->
+                    <a href="productos.html?categoria=derivados" class="category-card category-derivados">
+
+                        <div class="category-icon" aria-hidden="true">
+                            🌱
+                        </div>
+
+                        <h3>
+                            Derivados
+                        </h3>
+
+                        <p>
+                            Productos elaborados a partir de la caña.
+                        </p>
+
+                        <span class="category-link">
+                            Ver productos →
+                        </span>
+
+                    </a>
+
+
+                    <!-- CATEGORÍA: BEBIDAS -->
+                    <a href="productos.html?categoria=bebidas" class="category-card category-bebidas">
+
+                        <div class="category-icon" aria-hidden="true">
+                            🥤
+                        </div>
+
+                        <h3>
+                            Bebidas
+                        </h3>
+
+                        <p>
+                            Opciones para disfrutar la panela de otra manera.
+                        </p>
+
+                        <span class="category-link">
+                            Ver productos →
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================================
+        PRODUCTOS DESTACADOS
+        ======================================== -->
+
+        <section class="featured-products">
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <span class="section-tag">
+                        NUESTRA SELECCIÓN
+                    </span>
+
+                    <h2>
+                        Productos destacados
+                    </h2>
+
+                    <p>
+                        Descubre algunos de nuestros productos
+                        derivados de la caña de azúcar.
+                    </p>
+
+                </div>
+
+
+                <div class="products-grid" id="featured-products">
+                    <!-- Los productos se cargarán mediante JavaScript -->
+                </div>
+
+
+                <div class="products-section-action">
+
+                    <a href="productos.html" class="view-all-products">
+                        Ver todos los productos →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="historia" class="brand-story" aria-labelledby="story-title">
+
+            <div class="container brand-story-container">
+
+                <div class="brand-story-image">
+                    <img src="img/historia-productor.png" alt="Productor de Panela San Marcos junto a caña de azúcar">
+                </div>
+
+                <div class="brand-story-content">
+
+                    <span class="section-tag">
+                        ORIGEN Y TRADICIÓN
+                    </span>
+
+                    <h2 id="story-title">
+                        Nuestra historia
+                    </h2>
+
+                    <p>
+                        Desde El Paraíso - Pacto nace Panela San Marcos, un producto artesanal elaborado con dedicación por una comunidad que mantiene viva la tradición panelera desde hace más de dos generaciones.
+                    </p>
+
+                    <p>
+                        Nuestra panela se elabora a partir de caña de azúcar y representa el compromiso de la comunidad con la calidad, la sostenibilidad y el bienestar, manteniendo una tradición que ha pasado de generación en generación.
+                    </p>
+
+                    <ul class="story-values" aria-label="Valores de Panela San Marcos">
+                        <li>Calidad</li>
+                        <li>Sostenibilidad</li>
+                        <li>Bienestar</li>
+                        <li>Tradición artesanal</li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <section aria-labelledby="footer-brand-title">
+                <h2 id="footer-brand-title">Panela San Marcos</h2>
+                <p>Desde El Paraíso - Pacto</p>
+                <p>Pacto - El Paraíso, Quito, Ecuador</p>
+                <p><a href="tel:0979509568">097 950 9568</a></p>
+                <p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p>
+            </section>
+            <section aria-labelledby="footer-social-title">
+                <h2 id="footer-social-title">Síguenos</h2>
+                <ul class="footer-social-links">
+                    <li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                </ul>
+            </section>
+            <p class="footer-copyright">© 2026 Panela San Marcos</p>
+        </div>
+    </footer>
+
+
+    <script src="js/app.js"></script>
+    <script src="js/productos.js"></script>
+    <script src="js/store.js"></script>
+</body>
+
+</html>

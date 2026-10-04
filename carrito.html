@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu carrito | Panela San Marcos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+    <header class="site-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio">
+                <img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li>
+                        <a href="index.html#historia">Nosotros</a>
+                    </li>
+
+                    <li><a href="ayuda.html">Ayuda</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button type="button" class="search-button" data-search-toggle aria-label="Buscar" aria-expanded="false" aria-controls="header-search-panel">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                    Buscar
+                </button>
+                <a href="carrito.html" class="cart-button" aria-current="page">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    Carrito <span class="cart-count" aria-live="polite">(0)</span>
+                </a>
+            </div>
+        </div>
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+            <div class="container header-search-container">
+                <form id="header-search-form" role="search">
+                    <label for="header-product-search">Buscar productos</label>
+                    <div class="header-search-controls">
+                        <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off">
+                        <button type="button" class="header-search-close" id="header-search-close">Cerrar</button>
+                    </div>
+                </form>
+                <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe el nombre de un producto.</p>
+                <ul id="header-search-results" class="header-search-results"></ul>
+                <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+            </div>
+        </section>
+    </header>
+
+    <main id="main-content">
+        <section class="page-intro">
+            <div class="container">
+                <span class="section-tag">TU COMPRA</span>
+                <h1>Tu carrito</h1>
+            </div>
+        </section>
+
+        <section class="container cart-section" aria-labelledby="cart-title">
+            <h2 id="cart-title" class="visually-hidden">Productos en el carrito</h2>
+            <div id="cart-empty" class="empty-state" hidden>
+                <h2>Tu carrito está vacío</h2>
+                <p>Agrega algunos productos para continuar con tu compra.</p>
+                <a href="productos.html" class="action-button">Ver productos</a>
+            </div>
+            <div id="cart-content" class="cart-layout" hidden>
+                <div id="cart-items" class="cart-items" aria-label="Productos agregados"></div>
+                <aside class="order-summary" aria-labelledby="cart-summary-title">
+                    <h2 id="cart-summary-title">Resumen del pedido</h2>
+                    <dl class="summary-lines">
+                        <div><dt>Subtotal</dt><dd id="cart-subtotal"></dd></div>
+                        <div><dt>Envío</dt><dd>El costo aparece al elegir tu destino</dd></div>
+                        <div class="summary-total"><dt>Total parcial</dt><dd id="cart-total"></dd></div>
+                    </dl>
+                    <a href="checkout.html" class="action-button action-button-full">Continuar con el pedido</a>
+                    <a href="productos.html" class="secondary-action">Seguir comprando</a>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <section aria-labelledby="footer-brand-title">
+                <h2 id="footer-brand-title">Panela San Marcos</h2>
+                <p>Desde El Paraíso - Pacto</p>
+                <p>Pacto - El Paraíso, Quito, Ecuador</p>
+                <p><a href="tel:0979509568">097 950 9568</a></p>
+                <p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p>
+            </section>
+            <section aria-labelledby="footer-social-title">
+                <h2 id="footer-social-title">Síguenos</h2>
+                <ul class="footer-social-links">
+                    <li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                </ul>
+            </section>
+            <p class="footer-copyright">© 2026 Panela San Marcos</p>
+        </div>
+    </footer>
+
+    <script src="js/productos.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/carrito.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear una cuenta | Panela San Marcos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+    <header class="site-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio">
+                <img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li>
+                        <a href="index.html#historia">Nosotros</a>
+                    </li>
+
+                    <li><a href="ayuda.html">Ayuda</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button type="button" class="search-button" data-search-toggle aria-label="Buscar" aria-expanded="false" aria-controls="header-search-panel">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                    </svg>
+                    Buscar
+                </button>
+                <a href="carrito.html" class="cart-button">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    Carrito <span class="cart-count" aria-live="polite">(0)</span>
+                </a>
+            </div>
+        </div>
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+            <div class="container header-search-container">
+                <form id="header-search-form" role="search">
+                    <label for="header-product-search">Buscar productos</label>
+                    <div class="header-search-controls">
+                        <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off">
+                        <button type="button" class="header-search-close" id="header-search-close">Cerrar</button>
+                    </div>
+                </form>
+                <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe el nombre de un producto.</p>
+                <ul id="header-search-results" class="header-search-results"></ul>
+                <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+            </div>
+        </section>
+    </header>
+
+    <main id="main-content">
+        <section class="page-intro">
+            <div class="container">
+                <span class="section-tag">PANELA SAN MARCOS</span>
+                <h1>Crear una cuenta</h1>
+            </div>
+        </section>
+
+        <section class="container account-page" aria-labelledby="register-title">
+            <form id="register-form" class="account-form" novalidate>
+                <h2 id="register-title">Tus datos</h2>
+                <div class="form-grid account-form-grid">
+                    <div class="form-field">
+                        <label for="register-first-name">Nombre</label>
+                        <input id="register-first-name" name="firstName" type="text" autocomplete="given-name" required aria-describedby="register-first-name-error">
+                        <span class="field-error" id="register-first-name-error"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="register-last-name">Apellido</label>
+                        <input id="register-last-name" name="lastName" type="text" autocomplete="family-name" required aria-describedby="register-last-name-error">
+                        <span class="field-error" id="register-last-name-error"></span>
+                    </div>
+                    <div class="form-field form-field-full">
+                        <label for="register-email">Correo electrónico</label>
+                        <input id="register-email" name="email" type="email" autocomplete="email" required aria-describedby="register-email-error">
+                        <span class="field-error" id="register-email-error"></span>
+                    </div>
+                    <div class="form-field form-field-full">
+                        <label for="register-password">Contraseña</label>
+                        <div class="password-input-wrap">
+                            <input id="register-password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="register-password-error">
+                            <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-controls="register-password">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 0 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 0 1.172 8z" />
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16" aria-hidden="true" focusable="false" hidden>
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z" />
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829" />
+                                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <span class="field-error" id="register-password-error"></span>
+                    </div>
+                    <div class="form-field form-field-full">
+                        <label for="register-confirm-password">Confirmar contraseña</label>
+                        <div class="password-input-wrap">
+                            <input id="register-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required aria-describedby="register-confirm-password-error">
+                            <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-controls="register-confirm-password">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 0 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 0 1.172 8z" />
+                                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16" aria-hidden="true" focusable="false" hidden>
+                                    <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z" />
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829" />
+                                    <path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <span class="field-error" id="register-confirm-password-error"></span>
+                    </div>
+                </div>
+                <p class="account-feedback" id="register-feedback" role="alert" aria-live="assertive"></p>
+                <button type="submit" class="action-button action-button-full">Crear cuenta</button>
+                <p class="account-switch">¿Ya tienes una cuenta? <a href="login.html" data-login-link>Iniciar sesión</a></p>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-container">
+            <section aria-labelledby="footer-brand-title">
+                <h2 id="footer-brand-title">Panela San Marcos</h2>
+                <p>Desde El Paraíso - Pacto</p>
+                <p>Pacto - El Paraíso, Quito, Ecuador</p>
+                <p><a href="tel:0979509568">097 950 9568</a></p>
+                <p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p>
+            </section>
+            <section aria-labelledby="footer-social-title">
+                <h2 id="footer-social-title">Síguenos</h2>
+                <ul class="footer-social-links">
+                    <li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+                </ul>
+            </section>
+            <p class="footer-copyright">© 2026 Panela San Marcos</p>
+        </div>
+    </footer>
+
+    <script src="js/productos.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cuenta.js"></script>
+</body>
+
+</html>
