@@ -25,28 +25,51 @@
     document.getElementById("confirmation-destination").textContent = order.destination || order.customer.city || "No especificado";
     document.getElementById("confirmation-address").textContent = order.customer.address;
     document.getElementById("confirmation-payment").textContent = order.paymentMethod;
+    document.getElementById("confirmation-payment-status").textContent = order.paymentStatus || "PENDIENTE";
     document.getElementById("confirmation-date").textContent = Number.isNaN(orderDate.getTime())
         ? "Fecha no disponible"
         : orderDate.toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
 
     const orderStatus = document.getElementById("order-status");
     const cancelButton = document.getElementById("cancel-order-button");
+    const cancelPolicy = document.getElementById("cancel-order-policy");
+    const cancelFeedback = document.getElementById("cancel-order-feedback");
     const cancelDialog = document.getElementById("cancel-order-dialog");
     const backButton = document.getElementById("cancel-order-back");
     const confirmCancelButton = document.getElementById("confirm-cancel-order");
-    const orderIsCancelled = order.status === "Pedido cancelado";
+    const orderStatusValue = order.status || "PENDIENTE";
+    const orderIsCancelled = orderStatusValue === "CANCELADO";
+    const canCancelOrder = orderStatusValue === "PENDIENTE";
 
-    orderStatus.textContent = orderIsCancelled ? "Pedido cancelado" : "Pedido recibido";
+    orderStatus.textContent = orderStatusValue;
     cancelButton.hidden = orderIsCancelled;
+    cancelPolicy.hidden = orderIsCancelled;
     if (orderIsCancelled) {
         document.getElementById("confirmation-tag").textContent = "PEDIDO CANCELADO";
         document.getElementById("confirmation-title").textContent = "Pedido cancelado";
         document.getElementById("confirmation-lead").textContent = "Este pedido fue cancelado.";
+    } else if (!canCancelOrder) {
+        cancelPolicy.textContent = `Este pedido está ${orderStatusValue.toLowerCase()}. Ya no se puede cancelar desde la página.`;
+        document.getElementById("confirmation-tag").textContent = `PEDIDO ${orderStatusValue}`;
+        document.getElementById("confirmation-title").textContent = "Estado de tu pedido";
+        document.getElementById("confirmation-lead").textContent = "Puedes consultar aquí el estado actual de tu pedido.";
     }
     document.getElementById("cancel-order-number").textContent = order.reference;
     document.getElementById("cancel-order-total").textContent = money(order.total);
 
     cancelButton.addEventListener("click", () => {
+        if (!canCancelOrder) {
+            cancelFeedback.textContent = `No puedes cancelar este pedido porque está en estado ${orderStatusValue}. Solo se puede cancelar mientras está pendiente y antes de que empiece la preparación.`;
+            cancelFeedback.hidden = false;
+            return;
+        }
+
+        cancelFeedback.hidden = true;
+        cancelFeedback.textContent = "";
+        const paidByTransfer = order.paymentMethod === "Transferencia bancaria" && order.paymentStatus === "PAGADO";
+        document.getElementById("cancel-order-description").textContent = paidByTransfer
+            ? "Puedes cancelar el pedido porque aún está pendiente. Como ya pagaste por transferencia, tendrás que coordinar el reembolso con la tienda. Esta acción no se puede deshacer."
+            : "Puedes cancelar el pedido mientras esté pendiente, antes de que empiece la preparación. Esta acción no se puede deshacer.";
         cancelDialog.showModal();
         backButton.focus();
     });
@@ -54,7 +77,7 @@
     backButton.addEventListener("click", () => cancelDialog.close());
 
     cancelDialog.addEventListener("close", () => {
-        if (window.PanelaStore.getLastOrder()?.status === "Pedido cancelado") {
+        if (window.PanelaStore.getLastOrder()?.status === "CANCELADO") {
             orderStatus.focus();
         } else {
             cancelButton.focus();
@@ -74,16 +97,17 @@
     }, true);
 
     confirmCancelButton.addEventListener("click", () => {
-        if (!window.PanelaStore.setLastOrderStatus("Pedido cancelado")) {
+        if (!window.PanelaStore.setLastOrderStatus("CANCELADO")) {
             window.PanelaUI.showToast("No se pudo actualizar el pedido. Inténtalo de nuevo.");
             return;
         }
 
-        orderStatus.textContent = "Pedido cancelado";
+        orderStatus.textContent = "CANCELADO";
         document.getElementById("confirmation-tag").textContent = "PEDIDO CANCELADO";
         document.getElementById("confirmation-title").textContent = "Pedido cancelado";
         document.getElementById("confirmation-lead").textContent = "Este pedido fue cancelado.";
         cancelButton.hidden = true;
+        cancelPolicy.hidden = true;
         cancelDialog.close();
         window.PanelaUI.showToast(`Tu pedido #${order.reference} ha sido cancelado correctamente.`);
     });

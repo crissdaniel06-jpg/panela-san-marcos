@@ -205,7 +205,8 @@
             shipping: shippingCost,
             total: subtotal + shippingCost,
             createdAt: new Date().toISOString(),
-            status: "Pedido recibido"
+            status: "PENDIENTE",
+            paymentStatus: "PENDIENTE"
         };
 
         if (!window.PanelaStore.saveOrder(order)) {

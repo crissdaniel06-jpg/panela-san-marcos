@@ -636,7 +636,11 @@ h4 {
 
     border-radius: 50%;
 
-    font-size: 3rem;
+}
+
+.category-icon .bi {
+    font-size: 1.8rem;
+    line-height: 1;
 }
 
 
@@ -1990,6 +1994,21 @@ textarea:focus-visible {
     cursor: pointer;
 }
 
+.cancel-order-policy,
+.cancel-order-feedback {
+    flex: 1 1 100%;
+    margin: 0;
+}
+
+.cancel-order-policy {
+    color: var(--color-gris);
+}
+
+.cancel-order-feedback {
+    color: var(--color-vino);
+    font-weight: 600;
+}
+
 
 .cancel-order-dialog {
     width: min(520px, calc(100vw - 32px));
@@ -2406,6 +2425,12 @@ textarea:focus-visible {
 
 .footer-container a {
     color: var(--color-blanco);
+}
+
+.footer-container a .bi {
+    margin-right: 8px;
+    font-size: 1.1em;
+    vertical-align: -0.08em;
 }
 
 

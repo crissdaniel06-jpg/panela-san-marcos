@@ -290,7 +290,8 @@
         try {
             localStorage.setItem(orderStorageKey, JSON.stringify({
                 ...order,
-                status: order.status || "Pedido recibido"
+                status: order.status || "PENDIENTE",
+                paymentStatus: order.paymentStatus || "PENDIENTE"
             }));
             return true;
         } catch {
@@ -300,14 +301,24 @@
 
     function getLastOrder() {
         try {
-            return JSON.parse(localStorage.getItem(orderStorageKey) || "null");
+            const order = JSON.parse(localStorage.getItem(orderStorageKey) || "null");
+
+            if (!order) {
+                return null;
+            }
+
+            // Keep orders saved by earlier prototype versions readable.
+            if (order.status === "Pedido recibido") order.status = "PENDIENTE";
+            if (order.status === "Pedido cancelado") order.status = "CANCELADO";
+            order.paymentStatus ||= "PENDIENTE";
+            return order;
         } catch {
             return null;
         }
     }
 
     function setLastOrderStatus(status) {
-        if (!["Pedido recibido", "Pedido cancelado"].includes(status)) {
+        if (status !== "CANCELADO") {
             return false;
         }
 
@@ -317,7 +328,11 @@
             return false;
         }
 
-        order.status = status;
+        if (order.status !== "PENDIENTE") {
+            return false;
+        }
+
+        order.status = "CANCELADO";
         return saveOrder(order);
     }
 
