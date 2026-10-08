@@ -144,7 +144,7 @@
                             <input id="payment-transfer" name="metodoPago" type="radio" value="Transferencia bancaria" required aria-describedby="error-payment">
                             <span>Transferencia bancaria</span>
                         </label>
-                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden>Al continuar verás los datos de demostración para la transferencia.</p>
+                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden>Al continuar verás los datos de la cuenta para la transferencia.</p>
                         <label class="radio-option" for="payment-delivery">
                             <input id="payment-delivery" name="metodoPago" type="radio" value="Pago contra entrega" required aria-describedby="error-payment">
                             <span>Pago contra entrega</span>
@@ -164,10 +164,10 @@
                 <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia">×</button>
                 <h2 id="transfer-dialog-title">Pago por transferencia</h2>
                 <p id="transfer-dialog-description">La cuenta indicada es referencial. Confirma los datos oficiales con Panela San Marcos antes de realizar una transferencia.</p>
-                <div class="demo-warning" role="note"><strong>Banco Pichincha · Cuenta de ahorros</strong><br>Titular: Panela San Marcos<br>N.º de cuenta referencial: 2100000000<br>Identificación referencial: 0000000000</div>
+                <div class="transfer-account-note" role="note"><strong>Banco Pichincha · Cuenta de ahorros</strong><br>Titular: Panela San Marcos<br>N.º de cuenta referencial: 2100000000<br>Identificación referencial: 0000000000</div>
                 <div class="transfer-qr-section">
-                    <div class="demo-qr" role="img" aria-label="Código QR ilustrativo de demostración, no permite realizar pagos">
-                        <span aria-hidden="true">QR<br>DEMO</span>
+                    <div class="transfer-qr" role="img" aria-label="Código QR ilustrativo, no permite realizar pagos">
+                        <span aria-hidden="true">QR</span>
                     </div>
                     <p>QR ilustrativo de DEUNA. No es un código de pago válido.</p>
                 </div>

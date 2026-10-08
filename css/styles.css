@@ -2015,10 +2015,10 @@ textarea:focus-visible {
     width: 44px; height: 44px; border: 1px solid #777; border-radius: 50%;
     color: #222; background: white; font-size: 1.8rem; cursor: pointer;
 }
-.demo-warning { margin: 18px 0; padding: 16px; border-left: 4px solid #9b5b00; background: #fff5dc; line-height: 1.7; }
+.transfer-account-note { margin: 18px 0; padding: 16px; border-left: 4px solid #9b5b00; background: #fff5dc; line-height: 1.7; }
 .transfer-qr-section { display: flex; align-items: center; gap: 16px; margin: 16px 0; }
 .transfer-qr-section p, .receipt-field p { margin: 8px 0; }
-.demo-qr {
+.transfer-qr {
     display: grid; flex: 0 0 104px; width: 104px; height: 104px; place-items: center;
     border: 8px solid #fff; outline: 1px solid #333; color: #111;
     background: repeating-conic-gradient(#111 0% 25%, #fff 0% 50%) 0 / 16px 16px;
