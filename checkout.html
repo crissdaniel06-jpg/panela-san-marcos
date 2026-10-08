@@ -163,8 +163,8 @@
             <div class="transfer-dialog-content">
                 <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia">×</button>
                 <h2 id="transfer-dialog-title">Pago por transferencia</h2>
-                <p id="transfer-dialog-description">La cuenta indicada es referencial. Confirma los datos oficiales con Panela San Marcos antes de realizar una transferencia.</p>
-                <div class="transfer-account-note" role="note"><strong>Banco Pichincha · Cuenta de ahorros</strong><br>Titular: Panela San Marcos<br>N.º de cuenta referencial: 2100000000<br>Identificación referencial: 0000000000</div>
+                <p id="transfer-dialog-description">Realiza la transferencia a esta cuenta y adjunta una imagen del comprobante para confirmar el pedido.</p>
+                <div class="transfer-account-note" role="note"><strong>Banco Pichincha · Cuenta Transaccional</strong><br>Número: 2212271035</div>
                 <div class="transfer-qr-section">
                     <div class="transfer-qr" role="img" aria-label="Código QR ilustrativo, no permite realizar pagos">
                         <span aria-hidden="true">QR</span>
@@ -172,9 +172,9 @@
                     <p>QR ilustrativo de DEUNA. No es un código de pago válido.</p>
                 </div>
                 <div class="form-field receipt-field">
-                    <label for="receipt-upload">Comprobante</label>
-                    <input id="receipt-upload" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="receipt-help receipt-error">
-                    <p id="receipt-help" class="payment-help">Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
+                    <label for="receipt-upload">Comprobante <span aria-hidden="true">*</span></label>
+                    <input id="receipt-upload" type="file" accept="image/png,image/jpeg,image/webp" required aria-required="true" aria-describedby="receipt-help receipt-error">
+                    <p id="receipt-help" class="payment-help">Obligatorio. Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
                     <p id="receipt-status" class="visually-hidden" role="status" aria-live="polite"></p>
                     <p id="receipt-error" class="field-error" aria-live="polite"></p>
                     <img id="receipt-preview" class="receipt-preview" alt="Vista previa del comprobante seleccionado" hidden>

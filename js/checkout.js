@@ -275,7 +275,15 @@
     });
 
     receiptRemove.addEventListener("click", clearReceipt);
-    document.getElementById("transfer-confirm").addEventListener("click", completeOrder);
+    document.getElementById("transfer-confirm").addEventListener("click", () => {
+        if (!receiptInput.files.length) {
+            receiptInput.setAttribute("aria-invalid", "true");
+            receiptError.textContent = "Adjunta el comprobante para confirmar el pedido por transferencia.";
+            receiptInput.focus();
+            return;
+        }
+        completeOrder();
+    });
     document.getElementById("transfer-dialog-close").addEventListener("click", () => transferDialog.close());
     document.getElementById("transfer-dialog-cancel").addEventListener("click", () => transferDialog.close());
     transferDialog.addEventListener("close", () => {
