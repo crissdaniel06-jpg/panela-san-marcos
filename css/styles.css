@@ -1994,6 +1994,47 @@ textarea:focus-visible {
     cursor: pointer;
 }
 
+.transfer-dialog {
+    width: min(640px, calc(100% - 32px));
+    max-width: 640px;
+    max-height: min(90vh, 860px);
+    padding: 0;
+    overflow: auto;
+    border: 0;
+    border-radius: 12px;
+    color: var(--color-texto, #333);
+    background: #fff;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+}
+
+.transfer-dialog::backdrop { background: rgba(22, 18, 15, .68); }
+.transfer-dialog-content { position: relative; padding: 32px; }
+.transfer-dialog-content h2 { margin: 0 42px 12px 0; }
+.transfer-dialog-close {
+    position: absolute; top: 16px; right: 18px;
+    width: 44px; height: 44px; border: 1px solid #777; border-radius: 50%;
+    color: #222; background: white; font-size: 1.8rem; cursor: pointer;
+}
+.demo-warning { margin: 18px 0; padding: 16px; border-left: 4px solid #9b5b00; background: #fff5dc; line-height: 1.7; }
+.transfer-qr-section { display: flex; align-items: center; gap: 16px; margin: 16px 0; }
+.transfer-qr-section p, .receipt-field p { margin: 8px 0; }
+.demo-qr {
+    display: grid; flex: 0 0 104px; width: 104px; height: 104px; place-items: center;
+    border: 8px solid #fff; outline: 1px solid #333; color: #111;
+    background: repeating-conic-gradient(#111 0% 25%, #fff 0% 50%) 0 / 16px 16px;
+    font-weight: 700; text-align: center; text-shadow: 0 0 3px white, 0 0 3px white;
+}
+.receipt-field { margin: 20px 0; }
+.receipt-field input[type="file"] { display: block; max-width: 100%; min-height: 44px; margin: 8px 0; }
+.receipt-preview { display: block; max-width: 100%; max-height: 240px; margin: 12px 0; object-fit: contain; }
+.transfer-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.transfer-dialog :focus-visible { outline: 3px solid #145c9e; outline-offset: 3px; }
+@media (max-width: 540px) {
+    .transfer-dialog-content { padding: 24px 18px; }
+    .transfer-dialog-actions { flex-direction: column-reverse; }
+    .transfer-dialog-actions button { width: 100%; }
+}
+
 .cancel-order-policy,
 .cancel-order-feedback {
     flex: 1 1 100%;

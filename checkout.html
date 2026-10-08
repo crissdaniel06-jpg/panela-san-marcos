@@ -144,7 +144,7 @@
                             <input id="payment-transfer" name="metodoPago" type="radio" value="Transferencia bancaria" required aria-describedby="error-payment">
                             <span>Transferencia bancaria</span>
                         </label>
-                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden></p>
+                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden>Al continuar verás los datos de demostración para la transferencia.</p>
                         <label class="radio-option" for="payment-delivery">
                             <input id="payment-delivery" name="metodoPago" type="radio" value="Pago contra entrega" required aria-describedby="error-payment">
                             <span>Pago contra entrega</span>
@@ -159,6 +159,33 @@
                 </form>
             </div>
         </section>
+        <dialog id="transfer-dialog" class="transfer-dialog" aria-labelledby="transfer-dialog-title" aria-describedby="transfer-dialog-description">
+            <div class="transfer-dialog-content">
+                <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia">×</button>
+                <h2 id="transfer-dialog-title">Pago por transferencia</h2>
+                <p id="transfer-dialog-description">Estos datos son ficticios para demostración. No realices pagos con esta información.</p>
+                <div class="demo-warning" role="note"><strong>Cuenta de demostración</strong><br>Banco Pichincha · Cuenta de ahorros<br>Titular: Panela San Marcos (DEMO)<br>N.º de cuenta: 2100000000<br>Identificación: 0000000000</div>
+                <div class="transfer-qr-section">
+                    <div class="demo-qr" role="img" aria-label="Código QR ilustrativo de demostración, no permite realizar pagos">
+                        <span aria-hidden="true">QR<br>DEMO</span>
+                    </div>
+                    <p>QR ilustrativo de DEUNA. No es un código de pago válido.</p>
+                </div>
+                <div class="form-field receipt-field">
+                    <label for="receipt-upload">Comprobante (opcional)</label>
+                    <input id="receipt-upload" type="file" accept="image/png,image/jpeg,image/webp" aria-describedby="receipt-help receipt-error">
+                    <p id="receipt-help" class="payment-help">Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
+                    <p id="receipt-status" class="visually-hidden" role="status" aria-live="polite"></p>
+                    <p id="receipt-error" class="field-error" aria-live="polite"></p>
+                    <img id="receipt-preview" class="receipt-preview" alt="Vista previa del comprobante seleccionado" hidden>
+                    <button type="button" id="receipt-remove" class="secondary-action" hidden>Quitar imagen</button>
+                </div>
+                <div class="transfer-dialog-actions">
+                    <button type="button" id="transfer-dialog-cancel" class="secondary-action">Volver al checkout</button>
+                    <button type="button" id="transfer-confirm" class="action-button">Continuar y confirmar pedido</button>
+                </div>
+            </div>
+        </dialog>
     </main>
 
     <footer class="site-footer">

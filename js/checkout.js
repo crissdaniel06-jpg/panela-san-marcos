@@ -121,11 +121,18 @@
 
     const paymentOptions = [...form.querySelectorAll('[name="metodoPago"]')];
     const transferInfo = document.getElementById("transfer-info");
-    const transferMessage = "Los datos para realizar la transferencia serán proporcionados por Panela San Marcos después de confirmar el pedido.";
+    const transferDialog = document.getElementById("transfer-dialog");
+    const receiptInput = document.getElementById("receipt-upload");
+    const receiptPreview = document.getElementById("receipt-preview");
+    const receiptStatus = document.getElementById("receipt-status");
+    const receiptError = document.getElementById("receipt-error");
+    const receiptRemove = document.getElementById("receipt-remove");
+    let receiptUrl = null;
+    let pendingOrder = null;
+    let dialogTrigger = null;
 
     function updatePaymentGuidance() {
         const transferSelected = document.getElementById("payment-transfer").checked;
-        transferInfo.textContent = transferSelected ? transferMessage : "";
         transferInfo.hidden = !transferSelected;
     }
 
@@ -138,10 +145,8 @@
         });
     });
 
-    form.addEventListener("submit", event => {
-        event.preventDefault();
+    function validateAndCreateOrder() {
         feedback.textContent = "";
-
         const invalidControls = [];
 
         fields.forEach(field => {
@@ -170,7 +175,7 @@
         if (invalidControls.length > 0) {
             feedback.textContent = "Revisa los campos indicados antes de continuar.";
             invalidControls[0].focus();
-            return;
+            return null;
         }
 
         const formData = new FormData(form);
@@ -209,13 +214,74 @@
             paymentStatus: "PENDIENTE"
         };
 
-        if (!window.PanelaStore.saveOrder(order)) {
+        return order;
+    }
+
+    function completeOrder() {
+        if (!pendingOrder || !window.PanelaStore.saveOrder(pendingOrder)) {
             feedback.textContent = "No se pudo guardar el pedido en este navegador. Inténtalo de nuevo.";
             return;
         }
 
         window.PanelaStore.clearCart();
         window.location.assign("confirmacion.html");
+    }
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+        const order = validateAndCreateOrder();
+        if (!order) return;
+
+        if (order.paymentMethod === "Transferencia bancaria") {
+            pendingOrder = order;
+            dialogTrigger = document.activeElement;
+            transferDialog.showModal();
+            document.getElementById("transfer-dialog-close").focus();
+            return;
+        }
+        pendingOrder = order;
+        completeOrder();
+    });
+
+    function clearReceipt() {
+        if (receiptUrl) URL.revokeObjectURL(receiptUrl);
+        receiptUrl = null;
+        receiptInput.value = "";
+        receiptInput.removeAttribute("aria-invalid");
+        receiptError.textContent = "";
+        receiptPreview.removeAttribute("src");
+        receiptPreview.hidden = true;
+        receiptRemove.hidden = true;
+        receiptStatus.textContent = "";
+    }
+
+    receiptInput.addEventListener("change", () => {
+        const file = receiptInput.files[0];
+        receiptError.textContent = "";
+        if (!file) return;
+        if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+            clearReceipt();
+            receiptError.textContent = "Elige una imagen PNG, JPG o WebP de máximo 5 MB.";
+            receiptInput.setAttribute("aria-invalid", "true");
+            return;
+        }
+        receiptInput.removeAttribute("aria-invalid");
+        if (receiptUrl) URL.revokeObjectURL(receiptUrl);
+        receiptUrl = URL.createObjectURL(file);
+        receiptPreview.src = receiptUrl;
+        receiptPreview.hidden = false;
+        receiptRemove.hidden = false;
+        receiptStatus.textContent = `Vista previa lista: ${file.name}. La imagen no se ha enviado ni guardado.`;
+    });
+
+    receiptRemove.addEventListener("click", clearReceipt);
+    document.getElementById("transfer-confirm").addEventListener("click", completeOrder);
+    document.getElementById("transfer-dialog-close").addEventListener("click", () => transferDialog.close());
+    document.getElementById("transfer-dialog-cancel").addEventListener("click", () => transferDialog.close());
+    transferDialog.addEventListener("close", () => {
+        clearReceipt();
+        pendingOrder = null;
+        if (dialogTrigger && document.contains(dialogTrigger)) dialogTrigger.focus();
     });
 
     renderSummary();
