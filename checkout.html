@@ -161,22 +161,22 @@
         </section>
         <dialog id="transfer-dialog" class="transfer-dialog" aria-labelledby="transfer-dialog-title" aria-describedby="transfer-dialog-description">
             <div class="transfer-dialog-content">
-                <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia">×</button>
+                <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
                 <h2 id="transfer-dialog-title">Pago por transferencia</h2>
                 <p id="transfer-dialog-description">Realiza la transferencia a esta cuenta y adjunta una imagen del comprobante para confirmar el pedido.</p>
-                <div class="transfer-account-note" role="note"><strong>Banco Pichincha · Cuenta Transaccional</strong><br>Número: 2212271035</div>
+                <div class="transfer-account-note" role="note"><i class="bi bi-bank" aria-hidden="true"></i><div><strong>Banco Pichincha · Cuenta Transaccional</strong><br>Número: 2212271035</div></div>
                 <div class="form-field receipt-field">
-                    <label for="receipt-upload">Comprobante <span aria-hidden="true">*</span></label>
+                    <label for="receipt-upload"><i class="bi bi-receipt" aria-hidden="true"></i> Comprobante <span aria-hidden="true">*</span></label>
                     <input id="receipt-upload" type="file" accept="image/png,image/jpeg,image/webp" required aria-required="true" aria-describedby="receipt-help receipt-error">
-                    <p id="receipt-help" class="payment-help">Obligatorio. Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
+                    <p id="receipt-help" class="payment-help"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Obligatorio. Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
                     <p id="receipt-status" class="visually-hidden" role="status" aria-live="polite"></p>
                     <p id="receipt-error" class="field-error" aria-live="polite"></p>
                     <img id="receipt-preview" class="receipt-preview" alt="Vista previa del comprobante seleccionado" hidden>
-                    <button type="button" id="receipt-remove" class="secondary-action" hidden>Quitar imagen</button>
+                    <button type="button" id="receipt-remove" class="secondary-action" hidden><i class="bi bi-trash3" aria-hidden="true"></i> Quitar imagen</button>
                 </div>
                 <div class="transfer-dialog-actions">
-                    <button type="button" id="transfer-dialog-cancel" class="secondary-action">Volver al checkout</button>
-                    <button type="button" id="transfer-confirm" class="action-button">Continuar y confirmar pedido</button>
+                    <button type="button" id="transfer-dialog-cancel" class="secondary-action"><i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al checkout</button>
+                    <button type="button" id="transfer-confirm" class="action-button"><i class="bi bi-check2-circle" aria-hidden="true"></i> Continuar y confirmar pedido</button>
                 </div>
             </div>
         </dialog>

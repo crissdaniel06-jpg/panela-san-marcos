@@ -2015,7 +2015,10 @@ textarea:focus-visible {
     width: 44px; height: 44px; border: 1px solid #777; border-radius: 50%;
     color: #222; background: white; font-size: 1.8rem; cursor: pointer;
 }
-.transfer-account-note { margin: 18px 0; padding: 16px; border-left: 4px solid #9b5b00; background: #fff5dc; line-height: 1.7; }
+.transfer-account-note { display: flex; align-items: center; gap: 14px; margin: 18px 0; padding: 16px; border-left: 4px solid #9b5b00; background: #fff5dc; line-height: 1.7; }
+.transfer-account-note > i { flex: 0 0 auto; color: #704400; font-size: 1.6rem; }
+.receipt-field label > i, .receipt-field .payment-help > i { margin-right: 6px; color: var(--color-vino); }
+.transfer-dialog-actions i, .transfer-dialog-close i, #receipt-remove i { margin-right: 6px; }
 .receipt-field p { margin: 8px 0; }
 .receipt-field { margin: 20px 0; }
 .receipt-field input[type="file"] { display: block; max-width: 100%; min-height: 44px; margin: 8px 0; }
