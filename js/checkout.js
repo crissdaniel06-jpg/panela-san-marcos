@@ -121,6 +121,7 @@
 
     const paymentOptions = [...form.querySelectorAll('[name="metodoPago"]')];
     const transferInfo = document.getElementById("transfer-info");
+    const transferDialogEnabled = false;
     const transferDialog = document.getElementById("transfer-dialog");
     const receiptInput = document.getElementById("receipt-upload");
     const receiptPreview = document.getElementById("receipt-preview");
@@ -133,6 +134,9 @@
 
     function updatePaymentGuidance() {
         const transferSelected = document.getElementById("payment-transfer").checked;
+        transferInfo.textContent = transferDialogEnabled
+            ? "Al continuar verás los datos de la cuenta para la transferencia."
+            : "Los datos para realizar la transferencia serán proporcionados por Panela San Marcos después de confirmar el pedido.";
         transferInfo.hidden = !transferSelected;
     }
 
@@ -232,7 +236,7 @@
         const order = validateAndCreateOrder();
         if (!order) return;
 
-        if (order.paymentMethod === "Transferencia bancaria") {
+        if (transferDialogEnabled && order.paymentMethod === "Transferencia bancaria") {
             pendingOrder = order;
             dialogTrigger = document.activeElement;
             transferDialog.showModal();
