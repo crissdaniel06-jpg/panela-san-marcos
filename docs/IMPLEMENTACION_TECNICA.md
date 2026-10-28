@@ -2,11 +2,11 @@
 
 ## Estado
 
-El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos. La búsqueda usa una barra compacta integrada en el encabezado y su lista de sugerencias solo aparece al enfocar o escribir. Se añadieron la configuración opcional de Supabase, una migración inicial, perfil, favoritos y el flujo de creación de órdenes desde una función PostgreSQL. Sin URL y clave pública, catálogo y carrito siguen disponibles; cuentas, favoritos, pedidos y transferencias muestran que necesitan configuración. No se ha creado ni conectado un proyecto Supabase desde este entorno.
+El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos. La aplicación está conectada al proyecto Supabase con su URL y clave publicable. Tras ejecutar la migración, la API pública devuelve los ocho productos semilla y las funciones `create_order` y `cancel_order` existen, pero rechazan correctamente las llamadas anónimas. Auth responde. Las pruebas de usuario autenticado, Storage y navegador aún requieren una sesión de prueba.
 
 ## Archivos principales
 
-- `js/supabase-config.js`: crea el cliente con `window.PANELA_SUPABASE_CONFIG`; vacío por defecto.
+- `js/supabase-config.js`: crea el cliente con la configuración pública del proyecto; permite sobrescribirla con `window.PANELA_SUPABASE_CONFIG`.
 - `js/store.js`: carrito local y operaciones Auth, perfiles y favoritos mediante Supabase. Ya no crea usuarios locales ni guarda contraseñas; elimina claves de autenticación heredadas y descarta el resumen de pedido local al cerrar sesión o cambiar de propietario.
 - `js/perfil.js`, `cuenta.html`: lectura/edición del perfil, solicitud de cambio de email con confirmación y cambio/recuperación de contraseña por Auth.
 - `js/favoritos.js`, `favoritos.html`: lista privada y eliminación de favoritos.
@@ -16,12 +16,9 @@ El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos
 
 ## Configurar Supabase
 
-1. Crea un proyecto Supabase y copia su URL y clave `anon`/publicable.
-2. Edita `js/supabase-config.js` y completa `url` y `anonKey` con la URL y clave publicable. No uses `service_role`.
-3. Ejecuta `supabase/migrations/001_initial_schema.sql` una sola vez en el SQL Editor o con Supabase CLI enlazado al proyecto.
-4. En Authentication, configura URL del sitio y redirecciones para el dominio publicado en GitHub Pages y dominios locales; decide si la confirmación de correo permanece activa.
-5. La migración crea el bucket privado `transfer-receipts` (máximo 5 MiB, JPEG/PNG/PDF) y las políticas de lectura/carga por carpeta UUID del usuario.
-6. Prueba Auth, RLS y Storage en un proyecto de desarrollo antes de publicar la configuración pública.
+1. Ejecuta `supabase/migrations/001_initial_schema.sql` en el SQL Editor del proyecto. La migración crea el esquema, políticas RLS, RPC y bucket privado.
+2. En Authentication, configura la URL del sitio y las redirecciones para GitHub Pages y los dominios locales; decide si la confirmación de correo permanece activa.
+3. Prueba registro, inicio de sesión, RLS, creación/cancelación de pedidos y Storage con cuentas de prueba antes de procesar pedidos reales.
 
 El catálogo continúa definido en `js/productos.js`; los ocho productos se copian como semilla inicial a `public.products` con `ON CONFLICT DO NOTHING`. Si cambian productos/precios, sincroniza las dos fuentes o decide una migración de catálogo como siguiente tarea.
 
@@ -40,7 +37,7 @@ La función no valida transferencias bancarias ni aprueba pagos. La aprobación 
 
 ## Pruebas y limitaciones observadas
 
-Pruebas locales ejecutadas: `node --check` en todos los archivos JavaScript; revisión de diferencias con `git diff --check` (considerando CRLF del repositorio); búsqueda estática de claves privadas, contraseña de demostración, credenciales locales y número de cuenta; inspección del SQL y RLS. Las imágenes grandes se identificaron, pero no se convirtieron porque no hay codificador WebP/AVIF instalado; se añadieron carga diferida a tarjetas y dimensiones declaradas. No se ejecutaron consultas contra PostgreSQL (`psql` no está instalado) ni pruebas end-to-end porque no hay proyecto ni credenciales Supabase configurados. Tampoco se ha confirmado el comportamiento de las políticas Storage desplegadas, teclado, zoom ni responsive en navegador.
+Verificaciones realizadas en este entorno: `node --check` en los archivos JavaScript, `git diff --check`, Auth HTTP 200, consulta de `products` HTTP 200 con ocho filas y comprobación de que `create_order` y `cancel_order` niegan ejecución anónima (HTTP 401). No se probaron pedidos autenticados, políticas entre dos usuarios, carga/lectura de Storage ni el flujo visual del navegador porque no hay sesión de prueba disponible. Tampoco se ha confirmado teclado, zoom ni responsive en navegador.
 
 GitHub Pages sirve contenido estático: el código del navegador es inspeccionable y una URL poco conocida no restringe acceso. La clave publicable es visible por diseño; la protección depende de Auth/RLS/Storage y permisos SQL. Para contenido privado del sitio completo, se necesita un hosting con control de acceso de servidor. No se habilitó una ruta de aprobación de pago.
 
