@@ -82,8 +82,6 @@ h4 {
     border-bottom: 1px solid #eeeeee;
 }
 
-.header-search-panel { position: static; padding: 10px 0; border-top: 1px solid #eeeeee; box-shadow: none; }
-
 
 .header-container {
     min-height: 80px;
@@ -222,12 +220,6 @@ h4 {
 .header-actions a,
 .hero button {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.search-button {
-    background-color: var(--color-crema);
-
-    color: var(--color-vino);
 }
 
 
@@ -1114,6 +1106,112 @@ h4 {
         padding: 18px;
     }
 
+}
+
+/* Barra de búsqueda compacta integrada en la navegación */
+.header-search-inline {
+    position: relative;
+    z-index: 35;
+    display: flex;
+    flex: 1 1 320px;
+    min-width: 220px;
+    max-width: 760px;
+    height: 46px;
+    margin-inline: auto;
+    border: 1px solid #8a8a8a;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.header-search-inline:focus-within {
+    border-color: #5F1B32;
+    box-shadow: 0 0 0 2px rgba(95, 27, 50, .16);
+}
+
+.header-search-inline input {
+    flex: 1 1 auto;
+    width: 0;
+    min-width: 0;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 7px 0 0 7px;
+    background: transparent;
+    color: #333;
+    font: inherit;
+}
+
+.header-search-inline input:focus-visible {
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+.header-search-submit {
+    display: inline-flex;
+    flex: 0 0 52px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 0 6px 6px 0;
+    background: #EF9F45;
+    color: #333;
+    cursor: pointer;
+}
+
+.header-search-submit:hover { background: #e58a25; }
+.header-search-submit:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 2px !important; }
+
+.header-search-suggestions {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: 0;
+    left: 0;
+    z-index: 36;
+    max-height: min(55vh, 360px);
+    overflow: auto;
+    padding: 12px 16px;
+    border: 1px solid #dedede;
+    border-radius: 7px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgba(30, 20, 15, .2);
+}
+
+.header-search-status { margin: 0 0 4px; color: #555; font-size: .9rem; }
+.header-search-results { margin: 0; }
+.header-search-results li { padding: 9px 2px; }
+.header-search-results a { text-decoration: none; }
+.header-search-results a:hover { text-decoration: underline; }
+.header-search-all { margin: 8px 0 2px; }
+
+.site-header { z-index: 30; }
+body.search-is-open::before {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    pointer-events: none;
+    background: rgba(25, 20, 18, .28);
+    content: "";
+}
+
+@media (max-width: 1100px) and (min-width: 769px) {
+    .header-container { gap: 16px; }
+    .main-nav ul { gap: 14px; }
+    .header-search-inline { flex-basis: 230px; min-width: 180px; }
+    .header-actions { gap: 6px; }
+    .header-actions .auth-link, .header-actions .auth-user-toggle, .header-actions .cart-button { padding-inline: 9px; }
+}
+
+@media (max-width: 900px) and (min-width: 769px) {
+    .header-container { flex-wrap: wrap; row-gap: 12px; }
+    .header-actions { order: 2; }
+    .main-nav { order: 3; margin-right: auto; }
+    .header-search-inline { order: 4; flex: 1 0 100%; width: 100%; max-width: none; margin: 0; }
+}
+
+@media (max-width: 768px) {
+    .header-container { row-gap: 12px; }
+    .header-actions { order: 2; }
+    .header-search-inline { order: 4; flex: 1 0 100%; width: 100%; max-width: none; min-width: 0; margin: 0; }
+    .header-search-suggestions { max-height: 45vh; }
 }
 
 @media (max-width: 480px) {
@@ -2188,7 +2286,7 @@ textarea:focus-visible {
 .favorite-toggle { min-height: 44px; padding: 8px 12px; border: 1px solid #5F1B32; border-radius: 6px; background: #fff; color: #5F1B32; font: inherit; font-weight: 600; cursor: pointer; }
 .app-toast { border: 2px solid #14532D; border-left-width: 6px; border-left-color: #14532D; background-color: #FBF7E4; color: #333333; }
 .site-footer :focus-visible { outline: 3px solid #FBF7E4 !important; outline-offset: 3px; }
-.header-search-panel :focus-visible, .auth-user-panel :focus-visible, .account-switch a:focus-visible,
+.auth-user-panel :focus-visible, .account-switch a:focus-visible,
 .faq-item summary:focus-visible, .transfer-dialog :focus-visible, .cancel-order-dialog :focus-visible,
 .cancel-order-button:focus-visible, .header-actions .auth-link:focus-visible,
 .header-actions .auth-user-toggle:focus-visible, .header-actions .cart-button:focus-visible,
@@ -2279,87 +2377,6 @@ select:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 3p
 }
 
 
-.header-actions button.search-button {
-    min-height: 44px;
-
-    background-color: var(--color-crema);
-
-    color: var(--color-vino);
-}
-
-
-.header-search-panel {
-    position: absolute;
-
-    top: 100%;
-    right: 0;
-    left: 0;
-
-    z-index: 40;
-
-    padding: 18px 0 20px;
-
-    border-top: 1px solid #eeeeee;
-
-    background-color: var(--color-blanco);
-
-    box-shadow: 0 10px 24px rgba(51, 51, 51, 0.14);
-}
-
-
-.header-search-container {
-    position: relative;
-}
-
-
-.header-search-container label {
-    display: block;
-
-    margin-bottom: 6px;
-
-    color: var(--color-vino);
-
-    font-weight: 600;
-}
-
-
-.header-search-controls {
-    display: flex;
-
-    gap: 10px;
-}
-
-
-.header-search-controls input {
-    flex: 1 1 auto;
-
-    min-width: 0;
-    min-height: 44px;
-
-    padding: 9px 12px;
-
-    border: 1px solid #999999;
-    border-radius: 6px;
-}
-
-
-.header-search-close {
-    min-height: 44px;
-
-    padding: 8px 14px;
-
-    border: 1px solid #dddddd;
-    border-radius: 6px;
-
-    background-color: var(--color-blanco);
-
-    color: var(--color-vino);
-
-    font-weight: 600;
-
-    cursor: pointer;
-}
-
 
 .header-search-results {
     display: grid;
@@ -2415,15 +2432,6 @@ select:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 3p
     display: inline-block;
 
     margin-top: 10px;
-}
-
-
-.header-search-panel a:focus-visible,
-.header-search-close:focus-visible,
-.search-button:focus-visible {
-    outline: 2px solid var(--color-verde);
-
-    outline-offset: 2px;
 }
 
 
@@ -2562,10 +2570,6 @@ select:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 3p
 
 
 @media (max-width: 768px) {
-    .header-search-panel {
-        padding: 14px 0 16px;
-    }
-
     .footer-container {
         grid-template-columns: 1fr;
 

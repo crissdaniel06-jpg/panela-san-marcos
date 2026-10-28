@@ -2,7 +2,7 @@
 
 ## Estado
 
-El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos. Se añadieron la configuración opcional de Supabase, una migración inicial, perfil, favoritos y el flujo de creación de órdenes desde una función PostgreSQL. Sin URL y clave pública, catálogo y carrito siguen disponibles; cuentas, favoritos, pedidos y transferencias muestran que necesitan configuración. No se ha creado ni conectado un proyecto Supabase desde este entorno.
+El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos. La búsqueda usa una barra compacta integrada en el encabezado y su lista de sugerencias solo aparece al enfocar o escribir. Se añadieron la configuración opcional de Supabase, una migración inicial, perfil, favoritos y el flujo de creación de órdenes desde una función PostgreSQL. Sin URL y clave pública, catálogo y carrito siguen disponibles; cuentas, favoritos, pedidos y transferencias muestran que necesitan configuración. No se ha creado ni conectado un proyecto Supabase desde este entorno.
 
 ## Archivos principales
 

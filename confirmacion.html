@@ -29,15 +29,17 @@
                     </li>
                 </ul>
             </nav>
-            <div class="header-actions">
-                <button type="button" class="search-button" data-search-toggle aria-label="Buscar" aria-expanded="false" aria-controls="header-search-panel">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
-                    >
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
-                    </svg>
-                    Buscar
-                </button>
+            <form id="header-search-form" class="header-search-inline" role="search" autocomplete="off">
+                <label class="visually-hidden" for="header-product-search">Buscar productos</label>
+                <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off" aria-autocomplete="list" aria-controls="header-search-suggestions" aria-expanded="false">
+                <button class="header-search-submit" type="submit" aria-label="Buscar productos"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 1 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></button>
+                <div id="header-search-suggestions" class="header-search-suggestions" hidden>
+                    <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe para buscar productos.</p>
+                    <ul id="header-search-results" class="header-search-results"></ul>
+                    <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+                </div>
+            </form>
+        <div class="header-actions">
                 <a href="carrito.html" class="cart-button">
                     <svg
                         xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
@@ -48,20 +50,6 @@
                 </a>
             </div>
         </div>
-        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos">
-            <div class="container header-search-container">
-                <form id="header-search-form" role="search">
-                    <label for="header-product-search">Buscar productos</label>
-                    <div class="header-search-controls">
-                        <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off">
-                        <button type="button" class="header-search-close" id="header-search-close">Cerrar</button>
-                    </div>
-                </form>
-                <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe el nombre de un producto.</p>
-                <ul id="header-search-results" class="header-search-results"></ul>
-                <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
-            </div>
-        </section>
     </header>
 
     <main id="main-content" class="container confirmation-page">

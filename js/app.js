@@ -29,9 +29,8 @@
 		}
 	};
 
-	const searchButton = document.querySelector("[data-search-toggle]");
-	const searchPanel = document.getElementById("header-search-panel");
-	const searchForm = document.getElementById("header-search-form");
+	const searchForm = document.querySelector(".header-search-inline");
+	const searchInput = document.getElementById("header-product-search");
 	const headerActions = document.querySelector(".header-actions");
 	const cartLink = headerActions?.querySelector(".cart-button");
 	let userToggle;
@@ -127,28 +126,26 @@
 		window.addEventListener("resize", positionUserPanel);
 	}
 
-	if (searchButton && searchPanel && searchForm) {
-		const searchInput = document.getElementById("header-product-search");
+	if (searchForm && searchInput) {
 		const results = document.getElementById("header-search-results");
 		const status = document.getElementById("header-search-status");
 		const allResults = document.getElementById("header-search-all");
-		const closeButton = document.getElementById("header-search-close");
+		const suggestions = document.getElementById("header-search-suggestions");
 
 		function closeSearch(returnFocus = false) {
-			searchPanel.hidden = true;
-			searchButton.setAttribute("aria-expanded", "false");
-
-			if (returnFocus) {
-				searchButton.focus();
-			}
+			if (returnFocus) searchInput.focus();
+			suggestions.hidden = true;
+			searchInput.setAttribute("aria-expanded", "false");
+			document.body.classList.remove("search-is-open");
 		}
 
 		function renderSearchResults() {
 			const query = searchInput.value.trim();
 			const normalizedQuery = query.toLocaleLowerCase("es");
+			const products = window.PANELA_PRODUCTS || [];
 			const matches = normalizedQuery
-				? (window.PANELA_PRODUCTS || []).filter(product => product.nombre.toLocaleLowerCase("es").includes(normalizedQuery))
-				: [];
+				? products.filter(product => `${product.nombre} ${product.descripcion} ${window.PANELA_CATEGORY_NAMES[product.categoria]}`.toLocaleLowerCase("es").includes(normalizedQuery))
+				: products.slice(0, 3);
 
 			results.replaceChildren(...matches.map(product => {
 				const item = document.createElement("li");
@@ -163,33 +160,28 @@
 			}));
 
 			status.textContent = !query
-				? "Escribe el nombre de un producto."
+				? "Productos destacados"
 				: matches.length
 					? `${matches.length} ${matches.length === 1 ? "producto encontrado" : "productos encontrados"}.`
 					: "No encontramos productos con ese nombre.";
-			allResults.hidden = !query;
+			allResults.hidden = !query || matches.length === 0;
 			allResults.href = `productos.html?q=${encodeURIComponent(query)}`;
 		}
 
 		function openSearch() {
-			searchPanel.hidden = false;
-			searchButton.setAttribute("aria-expanded", "true");
+			suggestions.hidden = false;
+			searchInput.setAttribute("aria-expanded", "true");
+			document.body.classList.add("search-is-open");
 			renderSearchResults();
-			searchInput.focus();
 		}
 
-		searchButton.addEventListener("click", () => {
-			if (searchPanel.hidden) {
-				openSearch();
-			} else {
-				closeSearch(true);
-			}
-		});
+		searchInput.addEventListener("focus", openSearch);
+		searchInput.addEventListener("input", openSearch);
+		searchForm.addEventListener("focusout", () => window.setTimeout(() => {
+			if (!searchForm.contains(document.activeElement)) closeSearch();
+		}, 0));
 
-		closeButton.addEventListener("click", () => closeSearch(true));
-		searchInput.addEventListener("input", renderSearchResults);
-
-		searchPanel.addEventListener("keydown", event => {
+		searchForm.addEventListener("keydown", event => {
 			if (event.key === "Escape") {
 				event.preventDefault();
 				closeSearch(true);
@@ -211,10 +203,7 @@
 		});
 
 		results.addEventListener("keydown", event => {
-			if (event.key === "Escape") {
-				event.preventDefault();
-				closeSearch(true);
-			} else if (event.key === "ArrowUp" && event.target === results.querySelector("a")) {
+			if (event.key === "ArrowUp" && event.target === results.querySelector("a")) {
 				event.preventDefault();
 				searchInput.focus();
 			}
@@ -229,7 +218,7 @@
 		});
 
 		document.addEventListener("pointerdown", event => {
-			if (!searchPanel.hidden && !searchPanel.contains(event.target) && !searchButton.contains(event.target)) {
+			if (!suggestions.hidden && !searchForm.contains(event.target)) {
 				closeSearch();
 			}
 		});

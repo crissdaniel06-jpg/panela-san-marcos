@@ -6,7 +6,17 @@
 </head>
 <body>
   <a class="skip-link" href="#main-content">Saltar al contenido</a>
-  <header class="site-header"><div class="container header-container"><a class="logo" href="index.html">Panela San Marcos</a><nav class="main-nav" aria-label="Navegación principal"><a href="productos.html">Productos</a><a href="carrito.html">Carrito</a><a href="favoritos.html">Favoritos</a></nav><div class="header-actions"><a class="cart-button" href="carrito.html">Carrito <span class="cart-count">(0)</span></a></div></div></header>
+  <header class="site-header"><div class="container header-container"><a class="logo" href="index.html">Panela San Marcos</a><nav class="main-nav" aria-label="Navegación principal"><a href="productos.html">Productos</a><a href="carrito.html">Carrito</a><a href="favoritos.html">Favoritos</a></nav>                    <form id="header-search-form" class="header-search-inline" role="search" autocomplete="off">
+                <label class="visually-hidden" for="header-product-search">Buscar productos</label>
+                <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off" aria-autocomplete="list" aria-controls="header-search-suggestions" aria-expanded="false">
+                <button class="header-search-submit" type="submit" aria-label="Buscar productos"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 1 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></button>
+                <div id="header-search-suggestions" class="header-search-suggestions" hidden>
+                    <p id="header-search-status" class="header-search-status" role="status" aria-live="polite">Escribe para buscar productos.</p>
+                    <ul id="header-search-results" class="header-search-results"></ul>
+                    <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
+                </div>
+            </form>
+        <div class="header-actions"><a class="cart-button" href="carrito.html">Carrito <span class="cart-count">(0)</span></a></div></div></header>
   <main id="main-content" class="container account-page"><h1>Mi cuenta</h1><p id="account-state" class="form-feedback" role="status"></p>
     <form id="profile-form" class="account-form" hidden><h2>Datos personales</h2>
       <div class="form-field"><label for="profile-first">Nombre</label><input id="profile-first" required autocomplete="given-name"></div>
