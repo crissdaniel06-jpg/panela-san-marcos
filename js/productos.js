@@ -128,6 +128,9 @@ if (contenedorProductos) {
                     src="${producto.imagen}"
                     alt="${producto.alt}"
                     class="product-image"
+                    loading="lazy"
+                    width="600"
+                    height="600"
                 >
             </a>
 
@@ -154,7 +157,7 @@ if (contenedorProductos) {
                     href="producto.html?id=${producto.id}"
                     class="product-view-link"
                 >
-                    Ver producto →
+                    Ver ${producto.nombre} →
                 </a>
 
             </div>

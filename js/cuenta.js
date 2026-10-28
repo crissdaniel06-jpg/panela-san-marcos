@@ -1,8 +1,9 @@
 (() => {
-    const returnTargets = new Set(["index.html", "productos.html", "carrito.html", "checkout.html"]);
+    const returnTargets = new Set(["index.html", "productos.html", "carrito.html", "checkout.html", "cuenta.html", "favoritos.html"]);
     const parameters = new URLSearchParams(window.location.search);
     const requestedReturn = parameters.get("return");
-    const returnTo = returnTargets.has(requestedReturn) ? requestedReturn : "index.html";
+    const safeProductReturn = /^producto\.html\?id=\d+$/.test(requestedReturn || "");
+    const returnTo = returnTargets.has(requestedReturn) || safeProductReturn ? requestedReturn : "index.html";
     const loginForm = document.getElementById("login-form");
     const registerForm = document.getElementById("register-form");
 
@@ -58,10 +59,27 @@
         const passwordError = document.getElementById("login-password-error");
         const feedback = document.getElementById("login-feedback");
         const registerLink = document.querySelector("[data-register-link]");
+        const recoveryButton = document.querySelector("[data-password-recovery]");
 
-        if (registerLink && requestedReturn === "checkout.html") {
-            registerLink.href = "registro.html?return=checkout.html";
-        }
+        recoveryButton?.addEventListener("click", async () => {
+            feedback.textContent = "";
+            if (!isValidEmail(emailInput.value)) {
+                displayError(emailInput, emailError, "Ingresa tu correo electrónico para enviarte el enlace de recuperación.");
+                emailInput.focus();
+                return;
+            }
+            if (!window.supabaseClient) {
+                feedback.textContent = "La recuperación requiere configurar Supabase.";
+                return;
+            }
+            recoveryButton.disabled = true;
+            const redirectTo = `${window.location.origin}${window.location.pathname.replace(/login\.html$/, "cuenta.html")}?recovery=1`;
+            const { error } = await window.supabaseClient.auth.resetPasswordForEmail(emailInput.value.trim(), { redirectTo });
+            recoveryButton.disabled = false;
+            feedback.textContent = error ? "No se pudo enviar el enlace de recuperación. Inténtalo más tarde." : "Si el correo corresponde a una cuenta, recibirás instrucciones para restablecer la contraseña.";
+        });
+
+        if (registerLink && returnTo !== "index.html") registerLink.href = `registro.html?return=${encodeURIComponent(returnTo)}`;
 
         if (parameters.get("registered") === "1") {
             feedback.textContent = "Cuenta creada correctamente. Inicia sesión para continuar.";
@@ -69,7 +87,7 @@
 
         bindErrorClearing(loginForm);
 
-        loginForm.addEventListener("submit", event => {
+        loginForm.addEventListener("submit", async event => {
             event.preventDefault();
             feedback.textContent = "";
             const invalid = [];
@@ -96,12 +114,12 @@
                 return;
             }
 
-            const result = window.PanelaStore.login(emailInput.value, passwordInput.value);
+            const result = await window.PanelaStore.login(emailInput.value, passwordInput.value);
 
-            if (!result.ok) {
-                feedback.textContent = result.reason === "storage"
-                    ? "No se pudo guardar la sesión en este navegador. Inténtalo de nuevo."
-                    : "El correo o la contraseña no son correctos.";
+            if (result.error) {
+                feedback.textContent = result.error.message.includes("no está configurado")
+                    ? "El acceso requiere configurar Supabase. Consulta docs/IMPLEMENTACION_TECNICA.md."
+                    : "No se pudo iniciar sesión. Verifica tus datos o confirma tu correo.";
                 emailInput.setAttribute("aria-invalid", "true");
                 passwordInput.setAttribute("aria-invalid", "true");
                 passwordInput.focus();
@@ -126,13 +144,11 @@
         const feedback = document.getElementById("register-feedback");
         const loginLink = document.querySelector("[data-login-link]");
 
-        if (loginLink && requestedReturn === "checkout.html") {
-            loginLink.href = "login.html?return=checkout.html";
-        }
+        if (loginLink && returnTo !== "index.html") loginLink.href = `login.html?return=${encodeURIComponent(returnTo)}`;
 
         bindErrorClearing(registerForm);
 
-        registerForm.addEventListener("submit", event => {
+        registerForm.addEventListener("submit", async event => {
             event.preventDefault();
             feedback.textContent = "";
             const invalid = [];
@@ -183,28 +199,22 @@
                 return;
             }
 
-            const result = window.PanelaStore.registerUser({
+            const result = await window.PanelaStore.registerUser({
                 firstName: values["register-first-name"],
                 lastName: values["register-last-name"],
                 email: values["register-email"],
                 password: values["register-password"]
             });
 
-            if (!result.ok) {
-                if (result.reason === "duplicate") {
-                    const emailInput = document.getElementById("register-email");
-                    displayError(emailInput, document.getElementById("register-email-error"), "Ya existe una cuenta con este correo.");
-                    emailInput.focus();
-                } else {
-                    feedback.textContent = "No se pudo crear la cuenta en este navegador. Inténtalo de nuevo.";
-                }
+            if (result.error) {
+                feedback.textContent = result.error.message.includes("no está configurado")
+                    ? "El registro requiere configurar Supabase. Consulta docs/IMPLEMENTACION_TECNICA.md."
+                    : "No se pudo crear la cuenta. Comprueba si el correo ya está registrado e inténtalo de nuevo.";
                 return;
             }
 
-            const returnQuery = returnTo !== "index.html" ? `&return=${encodeURIComponent(returnTo)}` : "";
-            feedback.textContent = "Cuenta creada correctamente.";
-            window.PanelaUI.showToast("Cuenta creada correctamente.");
-            window.setTimeout(() => window.location.assign(`login.html?registered=1${returnQuery}`), 700);
+            feedback.textContent = "Solicitud enviada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.";
+            window.PanelaUI.showToast("Revisa tu correo para confirmar la cuenta.");
         });
     }
 })();

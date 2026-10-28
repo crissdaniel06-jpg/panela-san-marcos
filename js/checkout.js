@@ -1,4 +1,4 @@
-(() => {
+ (async () => {
     const form = document.getElementById("checkout-form");
 
     if (!form) {
@@ -21,8 +21,22 @@
 
     checkoutContent.hidden = false;
 
+    if (!window.supabaseClient) {
+        guestPrompt.hidden = false;
+        guestPrompt.textContent = "Para realizar una compra se requiere configurar Supabase y acceder con una cuenta.";
+        form.hidden = true;
+        return;
+    }
+    const { data: { session: initialSession } } = await window.supabaseClient.auth.getSession();
+    window.PanelaAuthUser = initialSession?.user ? { id: initialSession.user.id, email: initialSession.user.email, firstName: initialSession.user.user_metadata?.first_name || "" } : null;
     const currentUser = window.PanelaStore.getCurrentUser();
     guestPrompt.hidden = Boolean(currentUser);
+    if (!currentUser) {
+        guestPrompt.hidden = false;
+        guestPrompt.innerHTML = 'Para finalizar la compra, <a href="login.html?return=checkout.html">inicia sesión</a> o <a href="registro.html?return=checkout.html">crea una cuenta</a>. Tu carrito se conservará.';
+        form.hidden = true;
+        return;
+    }
 
     if (currentUser) {
         document.getElementById("first-name").value = currentUser.firstName;
@@ -121,7 +135,7 @@
 
     const paymentOptions = [...form.querySelectorAll('[name="metodoPago"]')];
     const transferInfo = document.getElementById("transfer-info");
-    const transferDialogEnabled = false;
+    const transferDialogEnabled = true;
     const transferDialog = document.getElementById("transfer-dialog");
     const receiptInput = document.getElementById("receipt-upload");
     const receiptPreview = document.getElementById("receipt-preview");
@@ -134,9 +148,7 @@
 
     function updatePaymentGuidance() {
         const transferSelected = document.getElementById("payment-transfer").checked;
-        transferInfo.textContent = transferDialogEnabled
-            ? "Al continuar verás los datos de la cuenta para la transferencia."
-            : "Los datos para realizar la transferencia serán proporcionados por Panela San Marcos después de confirmar el pedido.";
+        transferInfo.textContent = "Simulación académica. No se realiza ni verifica una transferencia real; el comprobante se recibirá en almacenamiento privado.";
         transferInfo.hidden = !transferSelected;
     }
 
@@ -215,28 +227,70 @@
             total: subtotal + shippingCost,
             createdAt: new Date().toISOString(),
             status: "PENDIENTE",
-            paymentStatus: "PENDIENTE"
+            paymentStatus: "PENDIENTE",
+            requestId: crypto.randomUUID()
         };
 
         return order;
     }
 
-    function completeOrder() {
-        if (!pendingOrder || !window.PanelaStore.saveOrder(pendingOrder)) {
-            feedback.textContent = "No se pudo guardar el pedido en este navegador. Inténtalo de nuevo.";
-            return;
+    let submitting = false;
+    async function completeOrder() {
+        if (!pendingOrder || submitting) return;
+        submitting = true;
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+        const client = window.supabaseClient;
+        try {
+            const { data: { session } } = await client.auth.getSession();
+            if (!session) throw new Error("Tu sesión expiró. Inicia sesión nuevamente.");
+            const orderInput = {
+                p_items: pendingOrder.items.map(item => ({ id: item.id, quantity: item.quantity })),
+                p_request_id: pendingOrder.requestId,
+                p_city: pendingOrder.destination,
+                p_payment_method: pendingOrder.paymentMethod,
+                p_customer: pendingOrder.customer
+            };
+            const { data: orderId, error } = await client.rpc("create_order", orderInput);
+            if (error) throw error;
+            pendingOrder.reference = orderId;
+            if (pendingOrder.paymentMethod === "Transferencia bancaria") {
+                const file = receiptInput.files[0];
+                if (!file) throw new Error("Adjunta el comprobante para continuar.");
+                const path = `${session.user.id}/${orderId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+                const upload = await client.storage.from("transfer-receipts").upload(path, file, { contentType: file.type, upsert: false });
+                if (upload.error) throw upload.error;
+                const receipt = await client.from("transfer_receipts").insert({ order_id: orderId, user_id: session.user.id, storage_path: path });
+                if (receipt.error) throw receipt.error;
+                pendingOrder.paymentStatus = "COMPROBANTE_RECIBIDO";
+            }
+            pendingOrder.createdAt = new Date().toISOString();
+            if (!window.PanelaStore.saveOrder(pendingOrder)) throw new Error("Pedido creado, pero no se pudo preparar el resumen local. Contacta soporte con este identificador: " + orderId);
+            window.PanelaStore.clearCart();
+            window.location.assign("confirmacion.html");
+        } catch (error) {
+            const message = error.message || "No se pudo crear el pedido. Inténtalo de nuevo.";
+            if (pendingOrder.paymentMethod === "Transferencia bancaria") receiptError.textContent = message;
+            else feedback.textContent = message;
+            submitting = false;
+            if (submitButton) submitButton.disabled = false;
         }
-
-        window.PanelaStore.clearCart();
-        window.location.assign("confirmacion.html");
     }
 
-    form.addEventListener("submit", event => {
+    form.addEventListener("submit", async event => {
         event.preventDefault();
+        if (transferDialog.open) return;
         const order = validateAndCreateOrder();
         if (!order) return;
 
         if (transferDialogEnabled && order.paymentMethod === "Transferencia bancaria") {
+            if (!receiptInput.files.length) {
+                pendingOrder = order;
+                dialogTrigger = document.activeElement;
+                transferDialog.showModal();
+                document.getElementById("transfer-dialog-close").focus();
+                return;
+            }
             pendingOrder = order;
             dialogTrigger = document.activeElement;
             transferDialog.showModal();
@@ -244,7 +298,7 @@
             return;
         }
         pendingOrder = order;
-        completeOrder();
+            await completeOrder();
     });
 
     function clearReceipt() {
@@ -263,19 +317,19 @@
         const file = receiptInput.files[0];
         receiptError.textContent = "";
         if (!file) return;
-        if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+        if (!/^image\/(png|jpeg)$/.test(file.type) && file.type !== "application/pdf" || file.size > 5 * 1024 * 1024) {
             clearReceipt();
-            receiptError.textContent = "Elige una imagen PNG, JPG o WebP de máximo 5 MB.";
+            receiptError.textContent = "Elige un archivo PNG, JPG o PDF de máximo 5 MB.";
             receiptInput.setAttribute("aria-invalid", "true");
             return;
         }
         receiptInput.removeAttribute("aria-invalid");
         if (receiptUrl) URL.revokeObjectURL(receiptUrl);
         receiptUrl = URL.createObjectURL(file);
-        receiptPreview.src = receiptUrl;
-        receiptPreview.hidden = false;
+        if (file.type.startsWith("image/")) { receiptPreview.src = receiptUrl; receiptPreview.hidden = false; }
+        else receiptPreview.hidden = true;
         receiptRemove.hidden = false;
-        receiptStatus.textContent = `Vista previa lista: ${file.name}. La imagen no se ha enviado ni guardado.`;
+        receiptStatus.textContent = `Archivo seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB). Se subirá al almacenamiento privado al confirmar.`;
     });
 
     receiptRemove.addEventListener("click", clearReceipt);

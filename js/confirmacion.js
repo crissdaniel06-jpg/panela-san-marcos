@@ -1,10 +1,11 @@
-(() => {
+ (async () => {
     const content = document.getElementById("confirmation-content");
 
     if (!content) {
         return;
     }
 
+    await window.PanelaAuthReady;
     const order = window.PanelaStore.getLastOrder();
     const emptyState = document.getElementById("confirmation-empty");
 
@@ -96,8 +97,10 @@
         }
     }, true);
 
-    confirmCancelButton.addEventListener("click", () => {
-        if (!window.PanelaStore.setLastOrderStatus("CANCELADO")) {
+    confirmCancelButton.addEventListener("click", async () => {
+        confirmCancelButton.disabled = true;
+        if (!await window.PanelaStore.setLastOrderStatus("CANCELADO")) {
+            confirmCancelButton.disabled = false;
             window.PanelaUI.showToast("No se pudo actualizar el pedido. Inténtalo de nuevo.");
             return;
         }

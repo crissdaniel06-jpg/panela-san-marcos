@@ -14,6 +14,8 @@
     const queryParameters = new URLSearchParams(window.location.search);
     const requestedCategory = queryParameters.get("categoria");
     let selectedCategory = validCategories.includes(requestedCategory) ? requestedCategory : "all";
+    const favoriteIds = new Set();
+    let favoriteUserId = null;
 
     searchInput.value = queryParameters.get("q") || "";
 
@@ -36,7 +38,7 @@
             return `
                 <article class="product-card">
                     <a href="producto.html?id=${product.id}" class="product-image-link">
-                        <img src="${product.imagen}" alt="${product.alt}" class="product-image">
+                        <img src="${product.imagen}" alt="${product.alt}" class="product-image" loading="lazy" width="600" height="600">
                     </a>
                     <div class="product-info">
                         <span class="product-category">${window.PANELA_CATEGORY_NAMES[product.categoria]}</span>
@@ -45,7 +47,8 @@
                         <p class="product-price"><span>Precio</span><br>$${product.precio.toFixed(2)}</p>
                         ${available === 0 ? '<p class="stock-message">No puedes agregar más unidades disponibles de este producto.</p>' : ""}
                         <div class="product-actions">
-                            <a href="producto.html?id=${product.id}" class="product-view-link">Ver producto</a>
+                            <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver ${product.nombre}">Ver producto</a>
+                            <button type="button" class="favorite-toggle" data-favorite-product="${product.id}" aria-label="${favoriteIds.has(product.id) ? `Quitar ${product.nombre} de favoritos` : `Añadir ${product.nombre} a favoritos`}">${favoriteIds.has(product.id) ? "Quitar de favoritos" : "Añadir a favoritos"}</button>
                             <button type="button" class="add-to-cart-button" data-add-product="${product.id}" aria-label="${addLabel}" ${available === 0 ? "disabled" : ""}>
                                 Agregar al carrito
                             </button>
@@ -80,6 +83,22 @@
     });
 
     results.addEventListener("click", event => {
+        const favoriteButton = event.target.closest("[data-favorite-product]");
+        if (favoriteButton) {
+            const id = Number(favoriteButton.dataset.favoriteProduct);
+            (async () => {
+                if (!window.supabaseClient) { window.PanelaUI.showToast("Los favoritos requieren configurar Supabase."); return; }
+                const { data: { user } } = await window.supabaseClient.auth.getUser();
+                if (!user) { window.location.assign(`login.html?return=${encodeURIComponent("productos.html")}`); return; }
+                window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
+                favoriteButton.disabled = true;
+                const result = await window.PanelaStore.setFavorite(id, !favoriteIds.has(id));
+                favoriteButton.disabled = false;
+                if (result.error) window.PanelaUI.showToast("No se pudo guardar el favorito.");
+                else { const name = window.PanelaStore.getProduct(id).nombre; if (favoriteIds.has(id)) { favoriteIds.delete(id); favoriteButton.textContent = "Añadir a favoritos"; favoriteButton.setAttribute("aria-label", `Añadir ${name} a favoritos`); window.PanelaUI.showToast(`${name} se quitó de favoritos.`); } else { favoriteIds.add(id); favoriteButton.textContent = "Quitar de favoritos"; favoriteButton.setAttribute("aria-label", `Quitar ${name} de favoritos`); window.PanelaUI.showToast(`${name} se añadió a favoritos.`); } }
+            })();
+            return;
+        }
         const addButton = event.target.closest("[data-add-product]");
 
         if (!addButton) {
@@ -100,5 +119,20 @@
         }
     });
 
-    renderProducts();
+    (async () => {
+        if (window.supabaseClient) {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (user) {
+                favoriteUserId = user.id;
+                window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
+                const { data } = await window.PanelaStore.getFavorites();
+                data?.forEach(row => favoriteIds.add(Number(row.product_id)));
+            }
+        }
+        renderProducts();
+    })();
+    window.addEventListener("panela:sessionchange", () => {
+        const userId = window.PanelaStore.getCurrentUser()?.id || null;
+        if (favoriteUserId !== null && userId !== favoriteUserId) window.location.reload();
+    });
 })();

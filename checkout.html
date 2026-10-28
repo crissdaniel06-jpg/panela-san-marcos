@@ -27,8 +27,6 @@
                     <li>
                         <a href="index.html#historia">Nosotros</a>
                     </li>
-
-                    <li><a href="ayuda.html">Ayuda</a></li>
                 </ul>
             </nav>
             <div class="header-actions">
@@ -50,7 +48,7 @@
                 </a>
             </div>
         </div>
-        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos">
             <div class="container header-search-container">
                 <form id="header-search-form" role="search">
                     <label for="header-product-search">Buscar productos</label>
@@ -164,11 +162,11 @@
                 <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
                 <h2 id="transfer-dialog-title">Pago por transferencia</h2>
                 <p id="transfer-dialog-description">Realiza la transferencia a esta cuenta y adjunta una imagen del comprobante para confirmar el pedido.</p>
-                <div class="transfer-account-note" role="note"><i class="bi bi-bank" aria-hidden="true"></i><div><strong>Banco Pichincha · Cuenta Transaccional</strong><br>Número: 2212271035</div></div>
+                <div class="transfer-account-note" role="note"><i class="bi bi-bank" aria-hidden="true"></i><div><strong>Simulación académica — Banco Pichincha</strong><br>No hay cuenta bancaria real asociada. No realices transferencias. La interfaz solo demuestra la recepción privada de un archivo.</div></div>
                 <div class="form-field receipt-field">
                     <label for="receipt-upload"><i class="bi bi-receipt" aria-hidden="true"></i> Comprobante <span aria-hidden="true">*</span></label>
-                    <input id="receipt-upload" type="file" accept="image/png,image/jpeg,image/webp" required aria-required="true" aria-describedby="receipt-help receipt-error">
-                    <p id="receipt-help" class="payment-help"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Obligatorio. Selecciona una imagen PNG, JPG o WebP de hasta 5 MB. Solo se mostrará en esta página; no se envía ni se guarda.</p>
+                    <input id="receipt-upload" type="file" accept="image/png,image/jpeg,application/pdf" required aria-required="true" aria-describedby="receipt-help receipt-error">
+                    <p id="receipt-help" class="payment-help"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Obligatorio para esta demostración. Selecciona PNG, JPG o PDF de hasta 5 MB. El archivo se guarda en el bucket privado al confirmar.</p>
                     <p id="receipt-status" class="visually-hidden" role="status" aria-live="polite"></p>
                     <p id="receipt-error" class="field-error" aria-live="polite"></p>
                     <img id="receipt-preview" class="receipt-preview" alt="Vista previa del comprobante seleccionado" hidden>
@@ -198,11 +196,14 @@
                     <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram" aria-hidden="true"></i>Instagram</a></li>
                 </ul>
             </section>
+            <p><a href="ayuda.html">Ayuda</a></p>
             <p class="footer-copyright">© 2026 Panela San Marcos</p>
         </div>
     </footer>
 
     <script src="js/productos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/store.js"></script>
     <script src="js/app.js"></script>
     <script src="js/checkout.js"></script>

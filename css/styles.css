@@ -82,6 +82,8 @@ h4 {
     border-bottom: 1px solid #eeeeee;
 }
 
+.header-search-panel { position: static; padding: 10px 0; border-top: 1px solid #eeeeee; box-shadow: none; }
+
 
 .header-container {
     min-height: 80px;
@@ -2176,8 +2178,30 @@ textarea:focus-visible {
 
 
 :focus-visible {
-    box-shadow: 0 0 0 1px var(--color-vino);
+    outline: 3px solid #5F1B32;
+    outline-offset: 3px;
+    box-shadow: none;
 }
+
+.related-products { margin-top: 64px; }
+.related-products h2 { margin-bottom: 24px; color: var(--color-vino); }
+.favorite-toggle { min-height: 44px; padding: 8px 12px; border: 1px solid #5F1B32; border-radius: 6px; background: #fff; color: #5F1B32; font: inherit; font-weight: 600; cursor: pointer; }
+.app-toast { border: 2px solid #14532D; border-left-width: 6px; border-left-color: #14532D; background-color: #FBF7E4; color: #333333; }
+.site-footer :focus-visible { outline: 3px solid #FBF7E4 !important; outline-offset: 3px; }
+.header-search-panel :focus-visible, .auth-user-panel :focus-visible, .account-switch a:focus-visible,
+.faq-item summary:focus-visible, .transfer-dialog :focus-visible, .cancel-order-dialog :focus-visible,
+.cancel-order-button:focus-visible, .header-actions .auth-link:focus-visible,
+.header-actions .auth-user-toggle:focus-visible, .header-actions .cart-button:focus-visible,
+select:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+:focus-visible { outline: 3px solid #5F1B32 !important; outline-offset: 3px !important; box-shadow: none !important; }
+.site-footer :focus-visible { outline-color: #FBF7E4 !important; }
+.action-button:focus-visible, .hero-primary-button:focus-visible, .hero-secondary-button:focus-visible,
+.category-card:focus-visible { outline: 3px solid #FBF7E4 !important; outline-offset: 2px !important; box-shadow: 0 0 0 6px #5F1B32 !important; }
 
 
 .product-card:focus-within {

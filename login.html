@@ -27,8 +27,6 @@
                     <li>
                         <a href="index.html#historia">Nosotros</a>
                     </li>
-
-                    <li><a href="ayuda.html">Ayuda</a></li>
                 </ul>
             </nav>
             <div class="header-actions">
@@ -50,7 +48,7 @@
                 </a>
             </div>
         </div>
-        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos" hidden>
+        <section class="header-search-panel" id="header-search-panel" aria-label="Buscar productos">
             <div class="container header-search-container">
                 <form id="header-search-form" role="search">
                     <label for="header-product-search">Buscar productos</label>
@@ -102,7 +100,7 @@
                 </div>
                 <p class="account-feedback" id="login-feedback" role="alert" aria-live="assertive"></p>
                 <button type="submit" class="action-button action-button-full">Iniciar sesión</button>
-                <p class="account-demo-note">Usuario de demostración disponible.</p>
+                <p class="account-switch"><button type="button" class="text-button" data-password-recovery>¿Olvidaste tu contraseña?</button></p>
                 <p class="account-switch">¿No tienes una cuenta? <a href="registro.html" data-register-link>Crear cuenta</a></p>
             </form>
         </section>
@@ -124,11 +122,14 @@
                     <li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram" aria-hidden="true"></i>Instagram</a></li>
                 </ul>
             </section>
+            <p><a href="ayuda.html">Ayuda</a></p>
             <p class="footer-copyright">© 2026 Panela San Marcos</p>
         </div>
     </footer>
 
     <script src="js/productos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/store.js"></script>
     <script src="js/app.js"></script>
     <script src="js/cuenta.js"></script>

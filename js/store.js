@@ -1,128 +1,67 @@
 (() => {
     const cartStorageKey = "panelaSanMarcosCart";
     const orderStorageKey = "panelaSanMarcosLastOrder";
-    const usersStorageKey = "panelaSanMarcosUsers";
-    const sessionStorageKey = "panelaSanMarcosCurrentUser";
+    const profileCacheKey = "panelaSanMarcosProfile";
+    // Retira credenciales de versiones anteriores que se guardaban en texto local.
+    try {
+        localStorage.removeItem("panelaSanMarcosUsers");
+        localStorage.removeItem("panelaSanMarcosCurrentUser");
+    } catch { /* El navegador puede bloquear el almacenamiento local. */ }
     const shippingRates = Object.freeze({
         Pacto: 1.50,
         Quito: 2.50,
         Cumbayá: 3.00,
         Tumbaco: 3.00
     });
-    const demoUser = {
-        id: "demo-customer",
-        firstName: "Cliente",
-        lastName: "Demostración",
-        email: "cliente@panelasanmarcos.com",
-        password: "123456"
-    };
-
-    function readUsers() {
-        try {
-            const users = JSON.parse(localStorage.getItem(usersStorageKey) || "[]");
-            return Array.isArray(users) ? users : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveUsers(users) {
-        try {
-            localStorage.setItem(usersStorageKey, JSON.stringify(users));
-            return true;
-        } catch {
-            return false;
-        }
-    }
-
-    function ensureDemoUser() {
-        const users = readUsers();
-        const demoExists = users.some(user => user.email.toLowerCase() === demoUser.email);
-
-        if (!demoExists) {
-            users.push(demoUser);
-            saveUsers(users);
-        }
-    }
-
-    function publicUser(user) {
-        return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email
-        };
-    }
-
     function getCurrentUser() {
-        try {
-            const session = JSON.parse(localStorage.getItem(sessionStorageKey) || "null");
-
-            if (!session) {
-                return null;
-            }
-
-            const user = readUsers().find(candidate => candidate.id === session.id && candidate.email === session.email);
-
-            if (!user) {
-                localStorage.removeItem(sessionStorageKey);
-                return null;
-            }
-
-            return publicUser(user);
-        } catch {
-            return null;
-        }
+        return window.PanelaAuthUser || null;
     }
 
     function notifySessionChange() {
         window.dispatchEvent(new Event("panela:sessionchange"));
     }
 
-    function registerUser({ firstName, lastName, email, password }) {
-        const normalizedEmail = email.trim().toLowerCase();
-        const users = readUsers();
-
-        if (users.some(user => user.email.toLowerCase() === normalizedEmail)) {
-            return { ok: false, reason: "duplicate" };
-        }
-
-        const user = {
-            id: `customer-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            email: normalizedEmail,
-            password
-        };
-
-        if (!saveUsers([...users, user])) {
-            return { ok: false, reason: "storage" };
-        }
-
-        return { ok: true, user: publicUser(user) };
+    function authUnavailable() { return { data: null, error: new Error("Supabase no está configurado. Revisa js/supabase-config.js.") }; }
+    async function registerUser({ firstName, lastName, email, password }) {
+        const client = window.supabaseClient;
+        if (!client) return authUnavailable();
+        return client.auth.signUp({ email: email.trim(), password, options: { data: { first_name: firstName.trim(), last_name: lastName.trim() } } });
     }
-
-    function login(email, password) {
-        const normalizedEmail = email.trim().toLowerCase();
-        const user = readUsers().find(candidate => candidate.email.toLowerCase() === normalizedEmail && candidate.password === password);
-
-        if (!user) {
-            return { ok: false, reason: "invalid" };
-        }
-
-        try {
-            localStorage.setItem(sessionStorageKey, JSON.stringify({ id: user.id, email: user.email }));
-        } catch {
-            return { ok: false, reason: "storage" };
-        }
-
-        notifySessionChange();
-        return { ok: true, user: publicUser(user) };
+    async function login(email, password) {
+        if (!window.supabaseClient) return authUnavailable();
+        return window.supabaseClient.auth.signInWithPassword({ email: email.trim(), password });
     }
-
-    function logout() {
-        localStorage.removeItem(sessionStorageKey);
+    async function logout() {
+        if (!window.supabaseClient) return authUnavailable();
+        const result = await window.supabaseClient.auth.signOut();
+        window.PanelaAuthUser = null;
+        localStorage.removeItem(profileCacheKey);
+        localStorage.removeItem(orderStorageKey);
         notifySessionChange();
+        return result;
+    }
+    async function loadProfile() {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return null;
+        const { data, error } = await window.supabaseClient.from("profiles").select("first_name,last_name,phone,address,city").eq("id", user.id).maybeSingle();
+        if (!error && data) return { ...data, email: user.email };
+        return null;
+    }
+    async function saveProfile(profile) {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return authUnavailable();
+        return window.supabaseClient.from("profiles").upsert({ id: user.id, first_name: profile.firstName, last_name: profile.lastName, phone: profile.phone, address: profile.address, city: profile.city, updated_at: new Date().toISOString() });
+    }
+    async function getFavorites() {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar favoritos.") };
+        return window.supabaseClient.from("favorites").select("product_id").eq("user_id", user.id);
+    }
+    async function setFavorite(productId, favorite) {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return authUnavailable();
+        const query = window.supabaseClient.from("favorites");
+        return favorite ? query.upsert({ user_id: user.id, product_id: Number(productId) }, { onConflict: "user_id,product_id" }) : query.delete().eq("user_id", user.id).eq("product_id", Number(productId));
     }
 
     function getProduct(id) {
@@ -287,9 +226,12 @@
     }
 
     function saveOrder(order) {
+        const owner = getCurrentUser();
+        if (!owner) return false;
         try {
             localStorage.setItem(orderStorageKey, JSON.stringify({
                 ...order,
+                userId: owner.id,
                 status: order.status || "PENDIENTE",
                 paymentStatus: order.paymentStatus || "PENDIENTE"
             }));
@@ -306,6 +248,10 @@
             if (!order) {
                 return null;
             }
+            if (!order.userId || order.userId !== getCurrentUser()?.id) {
+                localStorage.removeItem(orderStorageKey);
+                return null;
+            }
 
             // Keep orders saved by earlier prototype versions readable.
             if (order.status === "Pedido recibido") order.status = "PENDIENTE";
@@ -317,7 +263,7 @@
         }
     }
 
-    function setLastOrderStatus(status) {
+    async function setLastOrderStatus(status) {
         if (status !== "CANCELADO") {
             return false;
         }
@@ -332,6 +278,10 @@
             return false;
         }
 
+        if (!window.supabaseClient || !getCurrentUser()) return false;
+        const { data, error } = await window.supabaseClient.rpc("cancel_order", { p_order_id: order.reference });
+        if (error || !data) return false;
+
         order.status = "CANCELADO";
         return saveOrder(order);
     }
@@ -340,7 +290,23 @@
         return Object.hasOwn(shippingRates, city) ? shippingRates[city] : null;
     }
 
-    ensureDemoUser();
+    if (window.supabaseClient) {
+        let knownUserId = null;
+        const updateAuthUser = session => {
+            const nextUser = session?.user ? { id: session.user.id, email: session.user.email, firstName: session.user.user_metadata?.first_name || "" } : null;
+            if (knownUserId !== null && knownUserId !== nextUser?.id) localStorage.removeItem(orderStorageKey);
+            if (!nextUser) localStorage.removeItem(orderStorageKey);
+            knownUserId = nextUser?.id || null;
+            window.PanelaAuthUser = nextUser;
+            notifySessionChange();
+            return nextUser;
+        };
+        window.PanelaAuthReady = window.supabaseClient.auth.getSession().then(({ data }) => updateAuthUser(data.session));
+        window.supabaseClient.auth.onAuthStateChange((_event, session) => {
+            if (!session) localStorage.removeItem(profileCacheKey);
+            updateAuthUser(session);
+        });
+    } else window.PanelaAuthReady = Promise.resolve(null);
 
     window.PanelaStore = {
         getProduct,
@@ -360,6 +326,10 @@
         registerUser,
         login,
         logout,
+        loadProfile,
+        saveProfile,
+        getFavorites,
+        setFavorite,
         getCurrentUser,
         getShippingCost,
         shippingRates

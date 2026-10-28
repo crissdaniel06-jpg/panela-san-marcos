@@ -15,6 +15,9 @@
 			window.clearTimeout(toastTimer);
 			window.clearTimeout(toastHideTimer);
 			toast.textContent = message;
+			const isError = /no se pudo|no encontramos|error|inténtalo de nuevo/i.test(message);
+			toast.setAttribute("role", isError ? "alert" : "status");
+			toast.setAttribute("aria-live", isError ? "assertive" : "polite");
 			toast.hidden = false;
 			toast.classList.add("is-visible");
 			toastTimer = window.setTimeout(() => {
@@ -46,6 +49,8 @@
 			<section class="auth-user-panel" id="header-user-panel" aria-label="Mi cuenta" hidden>
 				<h2>Mi cuenta</h2>
 				<p data-auth-email></p>
+				<a href="cuenta.html">Editar perfil</a>
+				<a href="favoritos.html">Mis favoritos</a>
 				<button type="button" class="auth-logout-button" data-auth-logout>Cerrar sesión</button>
 			</section>
 		`;
@@ -98,8 +103,10 @@
 		});
 
 		userPanel.querySelector("[data-auth-logout]").addEventListener("click", () => {
-			window.PanelaStore.logout();
-			window.PanelaUI.showToast("Has cerrado sesión.");
+			window.PanelaStore.logout().then(({ error }) => {
+				if (error) window.PanelaUI.showToast("No se pudo cerrar sesión. Inténtalo de nuevo.");
+				else window.PanelaUI.showToast("Has cerrado sesión.");
+			});
 		});
 
 		userWidget.addEventListener("keydown", event => {

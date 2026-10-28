@@ -22,13 +22,80 @@
     document.getElementById("breadcrumb-product").textContent = product.nombre;
     document.getElementById("detail-image").src = product.imagen;
     document.getElementById("detail-image").alt = product.alt;
+    document.getElementById("detail-image").width = 800;
+    document.getElementById("detail-image").height = 640;
+    document.getElementById("detail-image").decoding = "async";
     document.getElementById("detail-category").textContent = window.PANELA_CATEGORY_NAMES[product.categoria];
     document.getElementById("detail-name").textContent = product.nombre;
     document.getElementById("detail-price").textContent = `$${product.precio.toFixed(2)}`;
     document.getElementById("detail-presentation").textContent = product.presentacion;
     document.getElementById("detail-description").textContent = product.descripcion;
+    const favoriteButton = document.createElement("button");
+    favoriteButton.type = "button";
+    favoriteButton.className = "favorite-toggle";
+    favoriteButton.textContent = "Añadir a favoritos";
+    favoriteButton.setAttribute("aria-label", `Añadir ${product.nombre} a favoritos`);
+    favoriteButton.addEventListener("click", async () => {
+        if (!window.supabaseClient) { window.PanelaUI.showToast("Los favoritos requieren configurar Supabase."); return; }
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) { window.location.assign(`login.html?return=${encodeURIComponent(`producto.html?id=${product.id}`)}`); return; }
+        window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
+        favoriteButton.disabled = true;
+        const isSaved = favoriteButton.dataset.saved === "true";
+        const { error } = await window.PanelaStore.setFavorite(product.id, !isSaved);
+        favoriteButton.disabled = false;
+        if (error) window.PanelaUI.showToast("No se pudo guardar el favorito.");
+        else { favoriteButton.dataset.saved = String(!isSaved); favoriteButton.textContent = isSaved ? "Añadir a favoritos" : "Quitar de favoritos"; favoriteButton.setAttribute("aria-label", `${isSaved ? "Añadir" : "Quitar"} ${product.nombre} ${isSaved ? "a" : "de"} favoritos`); window.PanelaUI.showToast(`${product.nombre} se ${isSaved ? "quitó de" : "añadió a"} favoritos.`); }
+    });
+    if (window.supabaseClient) window.supabaseClient.auth.getUser().then(async ({ data: { user } }) => {
+        if (!user) return;
+        window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
+        const { data } = await window.PanelaStore.getFavorites();
+        if (data?.some(row => Number(row.product_id) === product.id)) {
+            favoriteButton.dataset.saved = "true";
+            favoriteButton.textContent = "Quitar de favoritos";
+            favoriteButton.setAttribute("aria-label", `Quitar ${product.nombre} de favoritos`);
+        }
+    });
+    document.querySelector(".detail-content").append(favoriteButton);
     quantityInput.setAttribute("aria-label", `Cantidad de ${product.nombre}`);
     detail.hidden = false;
+
+    const related = window.PANELA_PRODUCTS.filter(item => item.id !== product.id && item.categoria === product.categoria).slice(0, 4);
+    const relatedSection = document.getElementById("related-products");
+    const relatedGrid = document.getElementById("related-products-grid");
+    if (related.length && relatedSection && relatedGrid) {
+        relatedGrid.replaceChildren(...related.map(item => {
+            const card = document.createElement("article");
+            card.className = "product-card";
+            const link = document.createElement("a");
+            link.className = "product-image-link";
+            link.href = `producto.html?id=${item.id}`;
+            link.setAttribute("aria-label", `Ver ${item.nombre}`);
+            const image = document.createElement("img");
+            image.className = "product-image";
+            image.src = item.imagen;
+            image.alt = item.alt;
+            image.loading = "lazy";
+            image.width = 600;
+            image.height = 600;
+            link.append(image);
+            const info = document.createElement("div");
+            info.className = "product-info";
+            const name = document.createElement("h3");
+            const nameLink = document.createElement("a");
+            nameLink.href = `producto.html?id=${item.id}`;
+            nameLink.textContent = item.nombre;
+            name.append(nameLink);
+            const price = document.createElement("p");
+            price.className = "product-price";
+            price.textContent = `$${item.precio.toFixed(2)}`;
+            info.append(name, price);
+            card.append(link, info);
+            return card;
+        }));
+        relatedSection.hidden = false;
+    }
 
     function updateAvailableQuantity() {
         const available = window.PanelaStore.getAvailableStock(product.id);
