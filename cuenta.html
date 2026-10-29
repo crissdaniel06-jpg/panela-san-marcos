@@ -2,11 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mi cuenta | Panela San Marcos</title><link rel="stylesheet" href="css/styles.css">
+  <title>Mi cuenta | Panela San Marcos</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Saltar al contenido</a>
-  <header class="site-header"><div class="container header-container"><a class="logo" href="index.html">Panela San Marcos</a><nav class="main-nav" aria-label="Navegación principal"><a href="productos.html">Productos</a><a href="carrito.html">Carrito</a><a href="favoritos.html">Favoritos</a></nav>                    <form id="header-search-form" class="header-search-inline" role="search" autocomplete="off">
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+<header class="site-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio">
+                <img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="productos.html">Productos</a></li>
+                    <li>
+                        <a href="index.html#historia">Nosotros</a>
+                    </li>
+                </ul>
+            </nav>
+            <form id="header-search-form" class="header-search-inline" role="search" autocomplete="off">
                 <label class="visually-hidden" for="header-product-search">Buscar productos</label>
                 <input id="header-product-search" type="search" placeholder="Buscar productos..." autocomplete="off" aria-autocomplete="list" aria-controls="header-search-suggestions" aria-expanded="false">
                 <button class="header-search-submit" type="submit" aria-label="Buscar productos"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 1 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg></button>
@@ -16,7 +34,18 @@
                     <a id="header-search-all" class="header-search-all" href="productos.html" hidden>Ver todos los resultados</a>
                 </div>
             </form>
-        <div class="header-actions"><a class="cart-button" href="carrito.html">Carrito <span class="cart-count">(0)</span></a></div></div></header>
+        <div class="header-actions">
+                <a href="carrito.html" class="cart-button">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"
+                    >
+                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l.84 4.479 9.144-.459L13.89 4zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                    </svg>
+                    Carrito <span class="cart-count" aria-live="polite">(0)</span>
+                </a>
+            </div>
+        </div>
+    </header>
   <main id="main-content" class="container account-page">
     <header class="account-heading"><span class="section-tag">TU PERFIL</span><h1>Mi cuenta</h1><p>Administra tus datos de contacto y la seguridad de tu cuenta.</p></header>
     <p id="account-state" class="account-state" role="status" aria-live="polite"></p>
