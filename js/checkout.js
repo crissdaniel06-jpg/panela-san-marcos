@@ -13,6 +13,20 @@
     const destinationRow = document.getElementById("checkout-destination-row");
     const guestPrompt = document.querySelector("[data-checkout-guest]");
 
+    const cart = window.PanelaStore.getCart();
+    if (cart.length === 0) {
+        emptyState.hidden = false;
+        return;
+    }
+
+    if (window.supabaseClient) {
+        await window.PanelaAuthReady;
+        if (!window.PanelaStore.getCurrentUser()) {
+            window.location.replace("login.html?return=checkout.html");
+            return;
+        }
+    }
+
     const productsLoad = await window.PanelaProductsReady;
     if (!productsLoad.ok) {
         emptyState.hidden = false;
@@ -20,13 +34,6 @@
         emptyState.querySelector("p").textContent = "Tu carrito se conserva. Vuelve a intentarlo cuando se restablezca la conexión.";
         return;
     }
-    const cart = window.PanelaStore.getCart();
-
-    if (cart.length === 0) {
-        emptyState.hidden = false;
-        return;
-    }
-
     checkoutContent.hidden = false;
 
     if (!window.supabaseClient) {
@@ -37,15 +44,13 @@
     }
     await window.PanelaAuthReady;
     const { data: { user: initialUser } } = await window.supabaseClient.auth.getUser();
-    window.PanelaAuthUser = initialUser ? { id: initialUser.id, email: initialUser.email, firstName: "", lastName: "" } : null;
-    const currentUser = window.PanelaStore.getCurrentUser();
-    guestPrompt.hidden = Boolean(currentUser);
-    if (!currentUser) {
-        guestPrompt.hidden = false;
-        guestPrompt.innerHTML = 'Para finalizar la compra, <a href="login.html?return=checkout.html">inicia sesión</a> o <a href="registro.html?return=checkout.html">crea una cuenta</a>. Tu carrito se conservará.';
-        form.hidden = true;
+    if (!initialUser || !window.PanelaStore.getCurrentUser()) {
+        window.location.replace("login.html?return=checkout.html");
         return;
     }
+    window.PanelaAuthUser = { id: initialUser.id, email: initialUser.email, firstName: "", lastName: "" };
+    const currentUser = window.PanelaStore.getCurrentUser();
+    guestPrompt.hidden = true;
 
     if (currentUser) {
         const { data: profile, error: profileError } = await window.supabaseClient

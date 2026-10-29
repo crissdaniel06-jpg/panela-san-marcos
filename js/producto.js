@@ -64,7 +64,7 @@
             favoriteButton.setAttribute("aria-label", `Quitar ${product.nombre} de favoritos`);
         }
     });
-    document.querySelector(".detail-content").append(favoriteButton);
+    document.querySelector(".detail-image-wrap").append(favoriteButton);
     quantityInput.setAttribute("aria-label", `Cantidad de ${product.nombre}`);
     detail.hidden = false;
 
