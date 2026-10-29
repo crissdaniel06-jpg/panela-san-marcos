@@ -35,7 +35,9 @@
       const category = document.createElement("span"); category.className = "product-category"; category.textContent = window.PANELA_CATEGORY_NAMES[product.categoria];
       const title = document.createElement("h3"); title.textContent = product.nombre;
       const presentation = document.createElement("p"); presentation.className = "product-presentation"; presentation.textContent = product.presentacion;
-      const price = document.createElement("p"); price.className = "product-price"; price.textContent = `$${product.precio.toFixed(2)}`;
+      const price = document.createElement("p"); price.className = "product-price";
+      const priceLabel = document.createElement("span"); priceLabel.className = "product-price-label"; priceLabel.textContent = "Precio";
+      const priceAmount = document.createElement("strong"); priceAmount.textContent = `$${product.precio.toFixed(2)}`; price.append(priceLabel, priceAmount);
       const actions = document.createElement("div"); actions.className = "product-actions";
       const view = document.createElement("a"); view.className = "product-view-link"; view.href = `producto.html?id=${product.id}`; view.textContent = "Ver producto";
       const remove = document.createElement("button"); remove.type = "button"; remove.className = "favorite-toggle is-active"; remove.setAttribute("aria-pressed", "true"); remove.setAttribute("aria-label", `Quitar ${product.nombre} de favoritos`); remove.textContent = "★";

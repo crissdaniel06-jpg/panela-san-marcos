@@ -96,7 +96,12 @@
             name.append(nameLink);
             const price = document.createElement("p");
             price.className = "product-price";
-            price.textContent = `$${item.precio.toFixed(2)}`;
+            const priceLabel = document.createElement("span");
+            priceLabel.className = "product-price-label";
+            priceLabel.textContent = "Precio";
+            const priceAmount = document.createElement("strong");
+            priceAmount.textContent = `$${item.precio.toFixed(2)}`;
+            price.append(priceLabel, priceAmount);
             info.append(name, price);
             card.append(link, info);
             return card;

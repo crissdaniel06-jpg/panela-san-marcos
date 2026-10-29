@@ -43,7 +43,7 @@
 		userWidget.innerHTML = `
 			<a href="login.html" class="auth-link" data-auth-guest>Iniciar sesión</a>
 			<button type="button" class="auth-user-toggle" data-auth-toggle aria-expanded="false" aria-controls="header-user-panel" hidden>
-				Hola, <span data-auth-name></span>
+				Hola,&nbsp;<span data-auth-name></span>
 			</button>
 			<section class="auth-user-panel" id="header-user-panel" aria-label="Mi cuenta" hidden>
 				<h2>Mi cuenta</h2>
@@ -104,7 +104,7 @@
 		userPanel.querySelector("[data-auth-logout]").addEventListener("click", () => {
 			window.PanelaStore.logout().then(({ error }) => {
 				if (error) window.PanelaUI.showToast("No se pudo cerrar sesión. Inténtalo de nuevo.");
-				else window.PanelaUI.showToast("Has cerrado sesión.");
+				else window.location.replace("index.html");
 			});
 		});
 

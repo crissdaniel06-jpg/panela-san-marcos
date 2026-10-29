@@ -138,7 +138,12 @@ function renderFeaturedProducts() {
         presentation.textContent = producto.presentacion;
         const price = document.createElement("p");
         price.className = "product-price";
-        price.textContent = `Precio · $${producto.precio.toFixed(2)}`;
+        const priceLabel = document.createElement("span");
+        priceLabel.className = "product-price-label";
+        priceLabel.textContent = "Precio";
+        const priceAmount = document.createElement("strong");
+        priceAmount.textContent = `$${producto.precio.toFixed(2)}`;
+        price.append(priceLabel, priceAmount);
         const view = document.createElement("a");
         view.href = imageLink.href;
         view.className = "product-view-link";

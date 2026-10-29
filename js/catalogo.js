@@ -7,7 +7,6 @@
 
     const categoryButtons = [...document.querySelectorAll("[data-category]")];
     const searchInput = document.getElementById("buscador");
-    const sortSelect = document.getElementById("catalog-sort");
     const emptyState = document.getElementById("catalog-empty");
     const clearSearchButton = document.getElementById("clear-search");
     const resultCount = document.getElementById("catalog-count");
@@ -33,11 +32,6 @@
             const matchesSearch = searchable.includes(searchTerm);
             return matchesCategory && matchesSearch;
         });
-        const sortMode = sortSelect?.value || "recommended";
-        if (sortMode === "price-asc") filteredProducts.sort((a, b) => a.precio - b.precio || a.id - b.id);
-        if (sortMode === "price-desc") filteredProducts.sort((a, b) => b.precio - a.precio || a.id - b.id);
-        if (sortMode === "name-asc") filteredProducts.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
-
         categoryButtons.forEach(button => {
             button.setAttribute("aria-pressed", String(button.dataset.category === selectedCategory));
         });
@@ -61,7 +55,7 @@
                         <span class="product-category">${category}</span>
                         <h3>${name}</h3>
                         <p class="product-presentation">${presentation}</p>
-                        <p class="product-price"><span>Precio</span><br>$${product.precio.toFixed(2)}</p>
+                        <p class="product-price"><span class="product-price-label">Precio</span><strong>$${product.precio.toFixed(2)}</strong></p>
                         ${available === 0 ? '<p class="stock-message">No puedes agregar más unidades disponibles de este producto.</p>' : ""}
                         <div class="product-actions">
                             <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver ${name}">Ver producto</a>
@@ -90,7 +84,6 @@
     });
 
     searchInput.addEventListener("input", renderProducts);
-    sortSelect?.addEventListener("change", renderProducts);
 
     clearSearchButton.addEventListener("click", () => {
         selectedCategory = "all";
