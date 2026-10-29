@@ -1,44 +1,44 @@
-# Implementación técnica — Panela San Marcos
+# Auditoría técnica — Panela San Marcos
 
-## Estado
+Fecha de revisión: 28 de octubre de 2026.
 
-El catálogo, carrito y navegación siguen siendo HTML/CSS/JavaScript estáticos. La aplicación está conectada al proyecto Supabase con su URL y clave publicable. Tras ejecutar la migración, la API pública devuelve los ocho productos semilla y las funciones `create_order` y `cancel_order` existen, pero rechazan correctamente las llamadas anónimas. Auth responde. Las pruebas de usuario autenticado, Storage y navegador aún requieren una sesión de prueba.
+## Pedidos y causa de `orders.id` nulo
 
-## Archivos principales
+- La aplicación llama `create_order` por RPC con `p_items`, `p_request_id`, `p_city`, `p_payment_method` y `p_customer`. Los nombres y tipos coinciden con la única sobrecarga remota: `(jsonb, text, text, jsonb, uuid) returns uuid`.
+- La definición remota inspeccionada antes del cambio asignaba `gen_random_uuid()` en la inserción explícita de `orders`; `orders.id` también tenía `DEFAULT gen_random_uuid()`. No hay triggers en `orders` y el código local no contiene otra inserción cliente a esa tabla.
+- La función está como `SECURITY DEFINER`, pertenece a `postgres`, usa `search_path` vacío y referencia objetos con esquema. `EXECUTE` está habilitado para `authenticated`, no para `anon`. La función obtiene `auth.uid()`, bloquea pedidos concurrentes por usuario y solicitud, bloquea filas de productos por ID, calcula los precios y hace el pedido y sus partidas en una sola transacción.
+- **No se pudo demostrar la causa original del error** con el esquema actual. El mensaje implicaría una inserción distinta o una definición antigua en el momento del fallo; eso es posible, pero no está comprobado. No se creó un pedido en producción para intentar reproducirlo. La función fue reemplazada de nuevo al aplicar la migración siguiente, pero no se afirma que el error quede reproducido o resuelto de extremo a extremo.
+- `js/checkout.js` ahora conserva el mismo ID de idempotencia en `localStorage` para sobrevivir recargas y fallos de red; valida el UUID devuelto y muestra errores de negocio comprensibles. La fuente de precios, stock, partidas y total sigue siendo `create_order` en el servidor. La confirmación vuelve a consultar el pedido real y RLS lo limita al propietario.
 
-- `js/supabase-config.js`: crea el cliente con la configuración pública del proyecto; permite sobrescribirla con `window.PANELA_SUPABASE_CONFIG`.
-- `js/store.js`: carrito local y operaciones Auth, perfiles y favoritos mediante Supabase. Ya no crea usuarios locales ni guarda contraseñas; elimina claves de autenticación heredadas y descarta el resumen de pedido local al cerrar sesión o cambiar de propietario.
-- `js/perfil.js`, `cuenta.html`: lectura/edición del perfil, solicitud de cambio de email con confirmación y cambio/recuperación de contraseña por Auth.
-- `js/favoritos.js`, `favoritos.html`: lista privada y eliminación de favoritos.
-- `js/checkout.js`: exige sesión, solicita orden al RPC, y carga comprobantes al bucket privado.
-- `supabase/migrations/001_initial_schema.sql`: esquema, carga inicial del catálogo, RLS, RPC y bucket.
-- `.env.example`: nombres ilustrativos de configuración; GitHub Pages no lee variables de entorno del servidor.
+## Perfil, catálogo y seguridad
 
-## Configurar Supabase
+- Registro envía `first_name` y `last_name` en `user_metadata`; el trigger remoto `handle_new_user` copia esos campos a `profiles.first_name` y `profiles.last_name`. La inspección remota encontró cero perfiles sin apellido y cero usuarios sin perfil. El checkout carga `profiles` por el UUID autenticado, sin depender de una propiedad de sesión que podía faltar.
+- Perfil ahora valida datos de contacto y escribe en `profiles`; historial e información de confirmación se leen de Supabase. El almacenamiento local de la última confirmación conserva solo el UUID del pedido y el propietario, no teléfono, correo ni dirección.
+- Catálogo, carrito, favoritos, detalle y checkout usan los productos disponibles y precios/stock leídos desde Supabase. Si no se pueden verificar, la interfaz no permite continuar con datos de catálogo en caché. La búsqueda incluye descripción y categoría; el catálogo ofrece orden por precio y nombre.
+- Favoritos usan la PK compuesta y `upsert` idempotente. RLS limita lectura e inserción/eliminación al usuario propietario.
+- Las seis tablas revisadas (`profiles`, `products`, `favorites`, `orders`, `order_items`, `transfer_receipts`) tienen RLS habilitado. Pedidos y partidas solo se leen por su propietario; no hay permiso de actualización directa del estado desde el navegador. `cancel_order` valida la sesión y el propietario.
+- El bucket `transfer-receipts` existe y es privado (límite 5 MB; JPEG, PNG y PDF). Las políticas revisadas limitan carga y lectura a la carpeta del usuario; la eliminación solo se admite para archivos propios que todavía no estén asociados a un comprobante. El estado de pago solo cambia a verificado mediante `review_transfer_receipt`, que exige `app_metadata.role = admin`.
+- La clave incluida en `js/supabase-config.js` es una clave publicable `sb_publishable_`; no se encontró `service_role`, `sb_secret` ni `localhost:3000` en los scripts revisados.
 
-1. Ejecuta `supabase/migrations/001_initial_schema.sql` en el SQL Editor del proyecto. La migración crea el esquema, políticas RLS, RPC y bucket privado.
-2. En Authentication, configura la URL del sitio y las redirecciones para GitHub Pages y los dominios locales; decide si la confirmación de correo permanece activa.
-3. Prueba registro, inicio de sesión, RLS, creación/cancelación de pedidos y Storage con cuentas de prueba antes de procesar pedidos reales.
+## Transferencias
 
-El catálogo continúa definido en `js/productos.js`; los ocho productos se copian como semilla inicial a `public.products` con `ON CONFLICT DO NOTHING`. Si cambian productos/precios, sincroniza las dos fuentes o decide una migración de catálogo como siguiente tarea.
+No hay evidencia comprobable de que el número bancario previamente escrito en `checkout.html` haya sido autorizado por el titular. Se quitó de la interfaz y se deshabilitó la opción. Para evitar que una llamada manual al RPC la eluda, se aplicó `20261028235518_disable_unverified_transfer`: los pedidos nuevos por transferencia se rechazan con `TRANSFER_UNAVAILABLE`; pago contra entrega continúa aceptado. Un reintento con un ID de una orden de transferencia ya existente conserva su respuesta idempotente. No se modificaron filas de pedidos ni productos.
 
-## Esquema y seguridad
+Para reactivar transferencias, el titular debe confirmar y configurar los datos bancarios. También se deben habilitar el flujo y el servidor de forma coordinada; actualmente los comprobantes existentes y las funciones de revisión permanecen disponibles para pedidos ya creados.
 
-- `profiles.id` referencia `auth.users`; guarda nombre, apellido, teléfono, dirección, ciudad y timestamps. Un trigger crea el perfil al registrar usuario.
-- `products` conserva las ocho fichas, precios, categoría, stock y disponibilidad. La lectura de productos disponibles es pública; el rol normal no tiene permisos de escritura.
-- `favorites` tiene PK compuesta `(user_id, product_id)` y cascadas a usuario/producto.
-- `orders` guarda propietario, estado, importe, método/estado de pago y copia de entrega; índice por propietario y fecha.
-- `order_items` conserva nombre y precio unitario históricos; tiene FK al pedido y al producto, índice por pedido, checks de cantidad y subtotal.
-- `transfer_receipts` referencia orden, usuario y ruta en Storage; trigger cambia el estado a `COMPROBANTE_RECIBIDO` al registrar metadatos.
-- RLS permite a cada usuario leer/editar su perfil y sus favoritos; pedidos, líneas y comprobantes solo se leen por su propietario. No hay políticas de escritura directa para órdenes ni de aprobación de pago.
-- `create_order(...)` solo se ejecuta como usuario autenticado. Recalcula precios, envío y total en PostgreSQL, valida ciudad, método, cantidad y disponibilidad, bloquea productos, descuenta stock y usa `request_id` único por usuario para que los reintentos devuelvan la misma orden. `cancel_order(uuid)` cancela únicamente órdenes pendientes propias y restaura stock; el cliente no puede escribir total, estado o propietario.
+## Configuración y despliegue
 
-La función no valida transferencias bancarias ni aprueba pagos. La aprobación simulada está desactivada. La pantalla identifica que los datos del Banco Pichincha son solo una simulación y no proporciona un número de cuenta real; no se debe transferir dinero.
+- Los enlaces de confirmación de registro y recuperación se construyen desde la URL actual, de modo que conservan el prefijo `/panela-san-marcos/` de GitHub Pages. El registro ahora envía `emailRedirectTo` a `login.html` dentro de esa base.
+- No fue posible leer la lista de URL permitidas de Supabase Auth desde las herramientas MCP. En el Dashboard se debe comprobar que la URL publicada de `login.html` y la ruta de `cuenta.html?recovery=1` estén permitidas antes de probar confirmación y recuperación.
+- La URL de proyecto local coincide con `nrvqfuzragjsxuvqljpb`. Los enlaces internos y recursos locales de las 11 páginas HTML pasan el verificador estático.
+- Se recorrió el sitio local en el navegador integrado: inicio, catálogo, filtro por categoría, búsqueda de producto, agregado al carrito, resumen del carrito y pantalla de inicio de sesión desde checkout. El filtro mostró dos productos de panela; la búsqueda «molida» mostró uno; el carrito conservó el producto y su subtotal de $2.50. La prueba se detuvo en el formulario de acceso para continuar con una cuenta de prueba.
+- El sitio publicado y su consola no se verificaron en esta sesión; las pruebas de interfaz se hicieron sobre el servidor local.
 
-## Pruebas y limitaciones observadas
+## Verificaciones y límites
 
-Verificaciones realizadas en este entorno: `node --check` en los archivos JavaScript, `git diff --check`, Auth HTTP 200, consulta de `products` HTTP 200 con ocho filas y comprobación de que `create_order` y `cancel_order` niegan ejecución anónima (HTTP 401). No se probaron pedidos autenticados, políticas entre dos usuarios, carga/lectura de Storage ni el flujo visual del navegador porque no hay sesión de prueba disponible. Tampoco se ha confirmado teclado, zoom ni responsive en navegador.
-
-GitHub Pages sirve contenido estático: el código del navegador es inspeccionable y una URL poco conocida no restringe acceso. La clave publicable es visible por diseño; la protección depende de Auth/RLS/Storage y permisos SQL. Para contenido privado del sitio completo, se necesita un hosting con control de acceso de servidor. No se habilitó una ruta de aprobación de pago.
-
-Falta conectar el proyecto Supabase y realizar QA visual/teclado/responsive y pruebas integradas reales; no se afirma conformidad WCAG total. Una integración bancaria futura exige proveedor/API autorizado, credenciales en servidor, verificación de transacciones y confirmación del pago solo desde servidor.
+- **Probado:** `node --check` pasó para todos los scripts JavaScript; `python tests/check_site.py` encontró 11 páginas y cero rutas, fragmentos o IDs duplicados/inexistentes. La revisión manual en navegador verificó catálogo, filtro, búsqueda, carrito y acceso hasta el formulario de login.
+- **Probado en la base remota:** lectura de columnas, restricciones, funciones, políticas y grants; verificación de `orders.id DEFAULT gen_random_uuid()`; listado de productos y coincidencia de IDs, precios, stock e imágenes con el catálogo local antes de hacer dinámica la lectura. Tras la migración, `create_order` conserva `returns uuid`, la inserción explícita de UUID y los grants correctos; `authenticated` puede ejecutar y `anon` no. `list_migrations` reportó `20261028235518 disable_unverified_transfer`.
+- Antes de la migración remota, `list_migrations` devolvió una lista vacía, aunque el esquema ya contenía columnas/estados que aparecen en otra migración local (`20261028232157_fix_order_creation_and_payment_states.sql`). Por tanto, existe una discrepancia entre el esquema remoto y su historial de migraciones; esa migración previa no se reaplicó para evitar operaciones repetidas sobre un esquema ya modificado.
+- Se comprobó después que el proyecto sigue con cero pedidos, cero partidas y cero comprobantes, y que las cantidades de stock permanecen en los mismos valores consultados antes. No se hicieron escrituras de datos de prueba.
+- **Pendiente de prueba de extremo a extremo:** registro con correo real, confirmación, inicio/cierre de sesión, perfil tras recarga, favoritos persistidos, checkout contra entrega, reintento de red, comprobante privado y aislamiento entre dos cuentas. Requiere navegador disponible, cuentas de prueba y, para correo/transferencia, servicios y datos del titular. No se realizaron compras ni transferencias.
+- **Pendiente:** continuar la prueba autenticada con una cuenta de prueba; revisar el diseño en móvil y hacer una prueba manual completa de teclado/lector de pantalla.

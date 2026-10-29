@@ -10,6 +10,15 @@
                 </div>
             </form>
         <div class="header-actions"><a class="cart-button" href="carrito.html">Carrito <span class="cart-count">(0)</span></a></div></div></header>
-<main id="main-content" class="container catalog-section"><h1>Mis favoritos</h1><p id="favorites-status" role="status" aria-live="polite"></p><div id="favorites-grid" class="products-grid"></div></main>
-<footer class="site-footer"><div class="container footer-container"><p>Panela San Marcos · <a href="ayuda.html">Ayuda</a></p></div></footer>
+<main id="main-content" class="container catalog-section favorites-page">
+  <div class="favorites-heading"><div><span class="section-tag">TU SELECCIÓN</span><h1>Mis favoritos</h1><p>Productos que guardaste para volver a encontrar fácilmente.</p></div><a href="productos.html" class="secondary-action">Ver productos</a></div>
+  <p id="favorites-status" class="favorites-status" role="status" aria-live="polite"></p>
+  <div id="favorites-grid" class="products-grid"></div>
+  <section id="favorites-empty" class="favorites-empty empty-state" hidden><span class="favorites-empty-star" aria-hidden="true">☆</span><h2>Aún no tienes favoritos</h2><p>Explora nuestros productos y guarda los que quieras tener a mano.</p><a href="productos.html" class="action-button">Explorar productos</a></section>
+</main>
+<footer class="site-footer"><div class="container footer-container">
+  <section aria-labelledby="footer-brand-title"><h2 id="footer-brand-title">Panela San Marcos</h2><p>Desde El Paraíso - Pacto</p><p>Pacto - El Paraíso, Quito, Ecuador</p><p><a href="https://wa.me/593979509568" target="_blank" rel="noopener noreferrer">097 950 9568</a></p><p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p></section>
+  <section aria-labelledby="footer-social-title"><h2 id="footer-social-title">Síguenos</h2><ul class="footer-social-links"><li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li><li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li></ul></section>
+  <p><a href="ayuda.html">Ayuda</a></p><p class="footer-copyright">© 2026 Panela San Marcos</p>
+</div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-config.js"></script><script src="js/productos.js"></script><script src="js/store.js"></script><script src="js/app.js"></script><script src="js/favoritos.js"></script></body></html>

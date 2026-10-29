@@ -22,10 +22,26 @@
     }
 
     function authUnavailable() { return { data: null, error: new Error("Supabase no está configurado. Revisa js/supabase-config.js.") }; }
-    async function registerUser({ firstName, lastName, email, password }) {
+    async function registerUser({ firstName, lastName, email, password, returnTo = "index.html" }) {
         const client = window.supabaseClient;
         if (!client) return authUnavailable();
-        return client.auth.signUp({ email: email.trim(), password, options: { data: { first_name: firstName.trim(), last_name: lastName.trim() } } });
+        const confirmationUrl = new URL("login.html", window.location.href);
+        confirmationUrl.searchParams.set("registered", "1");
+        if (typeof returnTo === "string" && /^(index|productos|carrito|checkout|cuenta|favoritos)\.html$/.test(returnTo)) {
+            confirmationUrl.searchParams.set("return", returnTo);
+        } else if (typeof returnTo === "string" && /^producto\.html\?id=\d+(?:&favorite=1)?$/.test(returnTo)) {
+            confirmationUrl.searchParams.set("return", returnTo);
+        } else if (typeof returnTo === "string" && /^productos\.html\?favorite=\d+$/.test(returnTo)) {
+            confirmationUrl.searchParams.set("return", returnTo);
+        }
+        return client.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+                data: { first_name: firstName.trim(), last_name: lastName.trim() },
+                emailRedirectTo: confirmationUrl.toString()
+            }
+        });
     }
     async function login(email, password) {
         if (!window.supabaseClient) return authUnavailable();
@@ -34,6 +50,7 @@
     async function logout() {
         if (!window.supabaseClient) return authUnavailable();
         const result = await window.supabaseClient.auth.signOut();
+        if (result.error) return result;
         window.PanelaAuthUser = null;
         localStorage.removeItem(profileCacheKey);
         localStorage.removeItem(orderStorageKey);
@@ -56,6 +73,26 @@
         const user = getCurrentUser();
         if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar favoritos.") };
         return window.supabaseClient.from("favorites").select("product_id").eq("user_id", user.id);
+    }
+
+    async function getOrders() {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar tus pedidos.") };
+        return window.supabaseClient.from("orders")
+            .select("id,status,subtotal,shipping,total,payment_method,payment_status,created_at,order_items(product_name,quantity,unit_price,line_subtotal)")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(25);
+    }
+
+    async function getOrderById(orderId) {
+        const user = getCurrentUser();
+        if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar este pedido.") };
+        return window.supabaseClient.from("orders")
+            .select("id,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,unit_price,quantity,line_subtotal)")
+            .eq("id", orderId)
+            .eq("user_id", user.id)
+            .maybeSingle();
     }
     async function setFavorite(productId, favorite) {
         const user = getCurrentUser();
@@ -90,7 +127,7 @@
             return [...quantities.entries()]
                 .map(([id, quantity]) => ({
                     id,
-                    quantity: Math.min(quantity, getProduct(id).stock)
+                    quantity: Math.min(quantity, 100)
                 }))
                 .filter(item => item.quantity > 0);
         } catch {
@@ -110,7 +147,7 @@
 
                 return {
                     id: product.id,
-                    quantity: Math.min(quantity, product.stock)
+                    quantity
                 };
             })
             .filter(Boolean);
@@ -229,12 +266,7 @@
         const owner = getCurrentUser();
         if (!owner) return false;
         try {
-            localStorage.setItem(orderStorageKey, JSON.stringify({
-                ...order,
-                userId: owner.id,
-                status: order.status || "PENDIENTE",
-                paymentStatus: order.paymentStatus || "PENDIENTE"
-            }));
+            localStorage.setItem(orderStorageKey, JSON.stringify({ reference: order.reference, userId: owner.id }));
             return true;
         } catch {
             return false;
@@ -253,11 +285,12 @@
                 return null;
             }
 
-            // Keep orders saved by earlier prototype versions readable.
-            if (order.status === "Pedido recibido") order.status = "PENDIENTE";
-            if (order.status === "Pedido cancelado") order.status = "CANCELADO";
-            order.paymentStatus ||= "PENDIENTE";
-            return order;
+            const reference = order.reference || order.id;
+            if (typeof reference !== "string" || !reference) return null;
+            // Replace legacy cached order details with an owner-scoped ID only.
+            const minimalOrder = { reference, userId: order.userId };
+            localStorage.setItem(orderStorageKey, JSON.stringify(minimalOrder));
+            return minimalOrder;
         } catch {
             return null;
         }
@@ -274,16 +307,10 @@
             return false;
         }
 
-        if (order.status !== "PENDIENTE") {
-            return false;
-        }
-
         if (!window.supabaseClient || !getCurrentUser()) return false;
         const { data, error } = await window.supabaseClient.rpc("cancel_order", { p_order_id: order.reference });
         if (error || !data) return false;
-
-        order.status = "CANCELADO";
-        return saveOrder(order);
+        return true;
     }
 
     function getShippingCost(city) {
@@ -293,7 +320,12 @@
     if (window.supabaseClient) {
         let knownUserId = null;
         const updateAuthUser = session => {
-            const nextUser = session?.user ? { id: session.user.id, email: session.user.email, firstName: session.user.user_metadata?.first_name || "" } : null;
+            const nextUser = session?.user ? {
+                id: session.user.id,
+                email: session.user.email,
+                firstName: session.user.user_metadata?.first_name || "",
+                lastName: session.user.user_metadata?.last_name || ""
+            } : null;
             if (knownUserId !== null && knownUserId !== nextUser?.id) localStorage.removeItem(orderStorageKey);
             if (!nextUser) localStorage.removeItem(orderStorageKey);
             knownUserId = nextUser?.id || null;
@@ -307,6 +339,47 @@
             updateAuthUser(session);
         });
     } else window.PanelaAuthReady = Promise.resolve(null);
+
+    window.PanelaProductsReady = window.supabaseClient
+        ? window.supabaseClient.from("products")
+            .select("id,name,description,price,category,presentation,image_path,stock,available")
+            .eq("available", true)
+            .order("id")
+            .then(({ data, error }) => {
+                if (error) throw error;
+                const knownProducts = new Map((window.PANELA_PRODUCTS || []).map(product => [Number(product.id), product]));
+                window.PANELA_PRODUCTS = (data || []).map(row => {
+                    const known = knownProducts.get(Number(row.id));
+                    const image = typeof row.image_path === "string" && /^img\/[\w./-]+$/.test(row.image_path) && !row.image_path.includes("..")
+                        ? row.image_path
+                        : known?.imagen || "";
+                    return {
+                        id: Number(row.id),
+                        nombre: String(row.name || ""),
+                        categoria: String(row.category || ""),
+                        precio: Number(row.price),
+                        presentacion: String(row.presentation || ""),
+                        stock: Math.max(0, Number(row.stock) || 0),
+                        descripcion: String(row.description || ""),
+                        imagen: image,
+                        alt: known?.alt || String(row.name || "Producto")
+                    };
+                }).filter(product => Number.isInteger(product.id) && product.nombre && Number.isFinite(product.precio) && product.imagen);
+                window.dispatchEvent(new Event("panela:productschange"));
+                return { ok: true };
+            })
+            .catch(error => {
+                window.PANELA_PRODUCTS = [];
+                window.PanelaProductsError = error;
+                window.dispatchEvent(new Event("panela:productschange"));
+                return { ok: false, error };
+            })
+        : Promise.resolve().then(() => {
+            window.PANELA_PRODUCTS = [];
+            window.PanelaProductsError = new Error("No hay conexión a Supabase.");
+            window.dispatchEvent(new Event("panela:productschange"));
+            return { ok: false, error: window.PanelaProductsError };
+        });
 
     window.PanelaStore = {
         getProduct,
@@ -322,6 +395,7 @@
         updateCartCount,
         saveOrder,
         getLastOrder,
+        getOrderById,
         setLastOrderStatus,
         registerUser,
         login,
@@ -329,6 +403,7 @@
         loadProfile,
         saveProfile,
         getFavorites,
+        getOrders,
         setFavorite,
         getCurrentUser,
         getShippingCost,

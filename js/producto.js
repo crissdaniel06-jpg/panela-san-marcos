@@ -1,15 +1,18 @@
-(() => {
+(async () => {
     const detail = document.getElementById("product-detail");
 
     if (!detail) {
         return;
     }
 
+    const productsLoad = await window.PanelaProductsReady;
+
     const productId = new URLSearchParams(window.location.search).get("id");
     const product = window.PanelaStore.getProduct(productId);
     const notFound = document.getElementById("product-not-found");
 
     if (!product) {
+        if (!productsLoad.ok) document.querySelector("#product-not-found p").textContent = "No pudimos verificar el catálogo. Comprueba tu conexión e inténtalo de nuevo.";
         notFound.hidden = false;
         return;
     }
@@ -33,19 +36,21 @@
     const favoriteButton = document.createElement("button");
     favoriteButton.type = "button";
     favoriteButton.className = "favorite-toggle";
-    favoriteButton.textContent = "Añadir a favoritos";
+    favoriteButton.textContent = "☆";
+    favoriteButton.setAttribute("aria-pressed", "false");
     favoriteButton.setAttribute("aria-label", `Añadir ${product.nombre} a favoritos`);
     favoriteButton.addEventListener("click", async () => {
-        if (!window.supabaseClient) { window.PanelaUI.showToast("Los favoritos requieren configurar Supabase."); return; }
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (!user) { window.location.assign(`login.html?return=${encodeURIComponent(`producto.html?id=${product.id}`)}`); return; }
-        window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
+        if (favoriteButton.disabled) return;
         favoriteButton.disabled = true;
+        if (!window.supabaseClient) { favoriteButton.disabled = false; window.PanelaUI.showToast("No se pudo conectar con tus favoritos."); return; }
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) { favoriteButton.disabled = false; window.location.assign(`login.html?return=${encodeURIComponent(`producto.html?id=${product.id}`)}`); return; }
+        window.PanelaAuthUser = { id: user.id, email: user.email, firstName: user.user_metadata?.first_name || "" };
         const isSaved = favoriteButton.dataset.saved === "true";
         const { error } = await window.PanelaStore.setFavorite(product.id, !isSaved);
         favoriteButton.disabled = false;
         if (error) window.PanelaUI.showToast("No se pudo guardar el favorito.");
-        else { favoriteButton.dataset.saved = String(!isSaved); favoriteButton.textContent = isSaved ? "Añadir a favoritos" : "Quitar de favoritos"; favoriteButton.setAttribute("aria-label", `${isSaved ? "Añadir" : "Quitar"} ${product.nombre} ${isSaved ? "a" : "de"} favoritos`); window.PanelaUI.showToast(`${product.nombre} se ${isSaved ? "quitó de" : "añadió a"} favoritos.`); }
+        else { favoriteButton.dataset.saved = String(!isSaved); favoriteButton.textContent = isSaved ? "☆" : "★"; favoriteButton.classList.toggle("is-active", !isSaved); favoriteButton.setAttribute("aria-pressed", String(!isSaved)); favoriteButton.setAttribute("aria-label", `${isSaved ? "Añadir" : "Quitar"} ${product.nombre} ${isSaved ? "a" : "de"} favoritos`); window.PanelaUI.showToast(`${product.nombre} se ${isSaved ? "quitó de" : "añadió a"} favoritos.`); }
     });
     if (window.supabaseClient) window.supabaseClient.auth.getUser().then(async ({ data: { user } }) => {
         if (!user) return;
@@ -53,7 +58,9 @@
         const { data } = await window.PanelaStore.getFavorites();
         if (data?.some(row => Number(row.product_id) === product.id)) {
             favoriteButton.dataset.saved = "true";
-            favoriteButton.textContent = "Quitar de favoritos";
+            favoriteButton.textContent = "★";
+            favoriteButton.classList.add("is-active");
+            favoriteButton.setAttribute("aria-pressed", "true");
             favoriteButton.setAttribute("aria-label", `Quitar ${product.nombre} de favoritos`);
         }
     });

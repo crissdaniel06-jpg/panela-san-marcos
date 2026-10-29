@@ -6,11 +6,53 @@
     }
 
     await window.PanelaAuthReady;
-    const order = window.PanelaStore.getLastOrder();
+    const latestOrder = window.PanelaStore.getLastOrder();
     const emptyState = document.getElementById("confirmation-empty");
 
-    if (!order || !Array.isArray(order.items) || order.items.length === 0) {
+    if (!latestOrder) {
         emptyState.hidden = false;
+        return;
+    }
+
+    const [productsLoad, orderResult] = await Promise.all([
+        window.PanelaProductsReady,
+        window.PanelaStore.getOrderById(latestOrder.reference)
+    ]);
+    if (orderResult.error || !orderResult.data) {
+        emptyState.hidden = false;
+        emptyState.querySelector("p").textContent = "No pudimos consultar el pedido. Inicia sesión con la cuenta que lo realizó y vuelve a intentarlo.";
+        return;
+    }
+    const saved = orderResult.data;
+    const order = {
+        reference: saved.id,
+        status: saved.status,
+        subtotal: Number(saved.subtotal),
+        shipping: Number(saved.shipping),
+        total: Number(saved.total),
+        paymentMethod: saved.payment_method,
+        paymentStatus: saved.payment_status,
+        createdAt: saved.created_at,
+        destination: saved.delivery_city,
+        customer: {
+            firstName: saved.customer_first_name,
+            lastName: saved.customer_last_name,
+            email: saved.customer_email,
+            phone: saved.customer_phone,
+            address: saved.delivery_address,
+            city: saved.delivery_city
+        },
+        items: (saved.order_items || []).map(item => ({
+            id: item.product_id,
+            name: item.product_name,
+            presentation: productsLoad.ok ? window.PanelaStore.getProduct(item.product_id)?.presentacion || "" : "",
+            quantity: Number(item.quantity),
+            subtotal: Number(item.line_subtotal)
+        }))
+    };
+    if (!order.items.length) {
+        emptyState.hidden = false;
+        emptyState.querySelector("p").textContent = "El pedido no tiene artículos visibles. Consulta el historial en Mi cuenta.";
         return;
     }
 
@@ -26,7 +68,16 @@
     document.getElementById("confirmation-destination").textContent = order.destination || order.customer.city || "No especificado";
     document.getElementById("confirmation-address").textContent = order.customer.address;
     document.getElementById("confirmation-payment").textContent = order.paymentMethod;
-    document.getElementById("confirmation-payment-status").textContent = order.paymentStatus || "PENDIENTE";
+    const paymentStatusLabels = {
+        PENDIENTE: "Pendiente",
+        COMPROBANTE_RECIBIDO: "Comprobante recibido; pendiente de revisión manual",
+        PENDIENTE_VERIFICACION: "Pendiente de revisión manual",
+        VERIFICADO: "Verificado por la tienda",
+        PAGADO: "Pagado",
+        RECHAZADO: "Rechazado",
+        REQUIERE_CORRECCION: "Se requiere un nuevo comprobante"
+    };
+    document.getElementById("confirmation-payment-status").textContent = paymentStatusLabels[order.paymentStatus] || "Pendiente";
     document.getElementById("confirmation-date").textContent = Number.isNaN(orderDate.getTime())
         ? "Fecha no disponible"
         : orderDate.toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
@@ -42,7 +93,7 @@
     const orderIsCancelled = orderStatusValue === "CANCELADO";
     const canCancelOrder = orderStatusValue === "PENDIENTE";
 
-    orderStatus.textContent = orderStatusValue;
+    orderStatus.textContent = orderStatusValue === "PENDIENTE" ? "Pendiente" : orderStatusValue === "CANCELADO" ? "Cancelado" : orderStatusValue;
     cancelButton.hidden = orderIsCancelled;
     cancelPolicy.hidden = orderIsCancelled;
     if (orderIsCancelled) {
@@ -78,7 +129,7 @@
     backButton.addEventListener("click", () => cancelDialog.close());
 
     cancelDialog.addEventListener("close", () => {
-        if (window.PanelaStore.getLastOrder()?.status === "CANCELADO") {
+        if (order.status === "CANCELADO") {
             orderStatus.focus();
         } else {
             cancelButton.focus();
@@ -105,7 +156,9 @@
             return;
         }
 
-        orderStatus.textContent = "CANCELADO";
+        order.status = "CANCELADO";
+
+        orderStatus.textContent = "Cancelado";
         document.getElementById("confirmation-tag").textContent = "PEDIDO CANCELADO";
         document.getElementById("confirmation-title").textContent = "Pedido cancelado";
         document.getElementById("confirmation-lead").textContent = "Este pedido fue cancelado.";

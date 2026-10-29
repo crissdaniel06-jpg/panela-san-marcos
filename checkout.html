@@ -71,7 +71,7 @@
                 <form id="checkout-form" class="checkout-layout" novalidate>
                     <section class="checkout-form" aria-labelledby="checkout-contact-title">
                         <h2 id="checkout-contact-title">Datos de contacto y entrega</h2>
-                        <p class="checkout-login-prompt" data-checkout-guest>¿Ya tienes una cuenta? <a href="login.html?return=checkout.html">Iniciar sesión</a>. También puedes continuar como invitado.</p>
+                        <p class="checkout-login-prompt" data-checkout-guest>Para realizar un pedido, inicia sesión con tu cuenta. <a href="login.html?return=checkout.html">Iniciar sesión</a>. Si aún no tienes cuenta, <a href="registro.html?return=checkout.html">regístrate</a>; tu carrito se conservará.</p>
                         <div class="form-grid">
                             <div class="form-field">
                                 <label for="first-name">Nombre</label>
@@ -127,10 +127,11 @@
                     <fieldset class="payment-options">
                         <legend>Método de pago</legend>
                         <label class="radio-option" for="payment-transfer">
-                            <input id="payment-transfer" name="metodoPago" type="radio" value="Transferencia bancaria" required aria-describedby="error-payment">
+                            <input id="payment-transfer" name="metodoPago" type="radio" value="Transferencia bancaria" disabled aria-describedby="transfer-unavailable">
                             <span>Transferencia bancaria</span>
                         </label>
-                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden>Al continuar verás los datos de la cuenta para la transferencia.</p>
+                        <p id="transfer-unavailable" class="payment-help">Temporalmente no disponible: estamos confirmando los datos de pago antes de recibir transferencias.</p>
+                        <p id="transfer-info" class="payment-help" role="status" aria-live="polite" hidden>El comprobante se recibirá en almacenamiento privado y el pago quedará pendiente de revisión manual.</p>
                         <label class="radio-option" for="payment-delivery">
                             <input id="payment-delivery" name="metodoPago" type="radio" value="Pago contra entrega" required aria-describedby="error-payment">
                             <span>Pago contra entrega</span>
@@ -149,12 +150,12 @@
             <div class="transfer-dialog-content">
                 <button type="button" id="transfer-dialog-close" class="transfer-dialog-close" aria-label="Cerrar información de transferencia"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
                 <h2 id="transfer-dialog-title">Pago por transferencia</h2>
-                <p id="transfer-dialog-description">Realiza la transferencia a esta cuenta y adjunta una imagen del comprobante para confirmar el pedido.</p>
-                <div class="transfer-account-note" role="note"><i class="bi bi-bank" aria-hidden="true"></i><div><strong>Simulación académica — Banco Pichincha</strong><br>No hay cuenta bancaria real asociada. No realices transferencias. La interfaz solo demuestra la recepción privada de un archivo.</div></div>
+                <p id="transfer-dialog-description">Realiza la transferencia y adjunta el comprobante. El pago quedará pendiente hasta que se revise manualmente.</p>
+                <p class="payment-help">Las transferencias están temporalmente deshabilitadas hasta confirmar los datos de pago.</p>
                 <div class="form-field receipt-field">
                     <label for="receipt-upload"><i class="bi bi-receipt" aria-hidden="true"></i> Comprobante <span aria-hidden="true">*</span></label>
                     <input id="receipt-upload" type="file" accept="image/png,image/jpeg,application/pdf" required aria-required="true" aria-describedby="receipt-help receipt-error">
-                    <p id="receipt-help" class="payment-help"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Obligatorio para esta demostración. Selecciona PNG, JPG o PDF de hasta 5 MB. El archivo se guarda en el bucket privado al confirmar.</p>
+                    <p id="receipt-help" class="payment-help"><i class="bi bi-cloud-arrow-up" aria-hidden="true"></i> Adjunta el comprobante en PNG, JPG o PDF (máximo 5 MB). Se guardará de forma privada y no implica que el pago haya sido verificado.</p>
                     <p id="receipt-status" class="visually-hidden" role="status" aria-live="polite"></p>
                     <p id="receipt-error" class="field-error" aria-live="polite"></p>
                     <img id="receipt-preview" class="receipt-preview" alt="Vista previa del comprobante seleccionado" hidden>

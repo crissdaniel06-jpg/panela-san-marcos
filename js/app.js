@@ -224,14 +224,19 @@
 		});
 	}
 
-	document.addEventListener("DOMContentLoaded", () => {
+	document.addEventListener("DOMContentLoaded", async () => {
+		await window.PanelaAuthReady;
 		window.PanelaStore?.updateCartCount();
 		if (guestLink) {
 			const user = window.PanelaStore?.getCurrentUser();
 			guestLink.hidden = Boolean(user);
 			userToggle.hidden = !user;
 			if (user) {
-				document.querySelector("[data-auth-name]").textContent = user.firstName;
+				if (window.supabaseClient) {
+					const { data: profile } = await window.supabaseClient.from("profiles").select("first_name").eq("id", user.id).maybeSingle();
+					if (profile?.first_name) user.firstName = profile.first_name;
+				}
+				document.querySelector("[data-auth-name]").textContent = user.firstName || "tu cuenta";
 				document.querySelector("[data-auth-email]").textContent = user.email;
 			}
 		}

@@ -17,18 +17,37 @@
                 </div>
             </form>
         <div class="header-actions"><a class="cart-button" href="carrito.html">Carrito <span class="cart-count">(0)</span></a></div></div></header>
-  <main id="main-content" class="container account-page"><h1>Mi cuenta</h1><p id="account-state" class="form-feedback" role="status"></p>
-    <form id="profile-form" class="account-form" hidden><h2>Datos personales</h2>
-      <div class="form-field"><label for="profile-first">Nombre</label><input id="profile-first" required autocomplete="given-name"></div>
-      <div class="form-field"><label for="profile-last">Apellido</label><input id="profile-last" required autocomplete="family-name"></div>
-      <div class="form-field"><label for="profile-phone">Celular</label><input id="profile-phone" type="tel" autocomplete="tel"></div>
-      <div class="form-field"><label for="profile-address">Dirección</label><input id="profile-address" autocomplete="street-address"></div>
-      <div class="form-field"><label for="profile-city">Ciudad</label><input id="profile-city" autocomplete="address-level2"></div>
-      <div class="form-field"><label for="profile-email">Correo electrónico</label><input id="profile-email" type="email" required autocomplete="email"></div>
-      <button class="action-button" type="submit">Guardar perfil</button>
-    </form>
-    <form id="password-form" class="account-form" hidden><h2>Cambiar contraseña</h2><div class="form-field"><label for="new-password">Nueva contraseña</label><input id="new-password" type="password" minlength="8" required autocomplete="new-password"></div><button class="action-button" type="submit">Actualizar contraseña</button></form>
+  <main id="main-content" class="container account-page">
+    <header class="account-heading"><span class="section-tag">TU PERFIL</span><h1>Mi cuenta</h1><p>Administra tus datos de contacto y la seguridad de tu cuenta.</p></header>
+    <p id="account-state" class="account-state" role="status" aria-live="polite"></p>
+    <div class="account-panels">
+      <form id="profile-form" class="account-form account-profile-card" hidden><div class="account-card-heading"><span aria-hidden="true">01</span><div><h2>Datos personales</h2><p>Usaremos estos datos para preparar tus pedidos.</p></div></div>
+        <div class="form-grid account-form-grid">
+          <div class="form-field"><label for="profile-first">Nombre</label><input id="profile-first" required autocomplete="given-name"></div>
+          <div class="form-field"><label for="profile-last">Apellido</label><input id="profile-last" required autocomplete="family-name"></div>
+          <div class="form-field"><label for="profile-phone">Celular</label><input id="profile-phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[+]?[-0-9() ]{7,20}" title="Ingresa al menos 7 dígitos."></div>
+          <div class="form-field"><label for="profile-email">Correo electrónico</label><input id="profile-email" type="email" required autocomplete="email"></div>
+          <div class="form-field form-field-full"><label for="profile-address">Dirección</label><input id="profile-address" autocomplete="street-address"></div>
+          <div class="form-field form-field-full"><label for="profile-city">Ciudad</label><input id="profile-city" autocomplete="address-level2"></div>
+        </div>
+        <div class="account-form-actions"><button class="action-button" type="submit">Guardar cambios</button></div>
+      </form>
+      <form id="password-form" class="account-form account-security-card" hidden><div class="account-card-heading"><span aria-hidden="true">02</span><div><h2>Seguridad</h2><p>Actualiza tu contraseña para mantener tu cuenta protegida.</p></div></div><div class="form-field"><label for="new-password">Nueva contraseña</label><input id="new-password" type="password" minlength="8" required autocomplete="new-password" aria-describedby="password-help"><small id="password-help">Usa al menos 8 caracteres.</small></div><button class="secondary-action" type="submit">Actualizar contraseña</button></form>
+    </div>
+    <section class="account-orders" aria-labelledby="account-orders-title">
+      <div class="account-card-heading"><span aria-hidden="true">03</span><div><h2 id="account-orders-title">Tus pedidos</h2><p>Consulta los pedidos asociados a tu cuenta y su estado actual.</p></div></div>
+      <p id="orders-state" class="account-state" role="status" aria-live="polite">Cargando pedidos…</p>
+      <div id="account-orders-list" class="account-orders-list"></div>
+    </section>
+    <nav class="account-shortcuts" aria-label="Accesos de cuenta">
+      <a href="favoritos.html">Ver mis favoritos</a>
+      <a href="productos.html">Explorar productos</a>
+    </nav>
   </main>
-  <footer class="site-footer"><div class="container footer-container"><p>Panela San Marcos · <a href="ayuda.html">Ayuda</a></p></div></footer>
+  <footer class="site-footer"><div class="container footer-container">
+    <section aria-labelledby="footer-brand-title"><h2 id="footer-brand-title">Panela San Marcos</h2><p>Desde El Paraíso - Pacto</p><p>Pacto - El Paraíso, Quito, Ecuador</p><p><a href="https://wa.me/593979509568" target="_blank" rel="noopener noreferrer">097 950 9568</a></p><p><a href="mailto:imporparaiso@gmail.com">imporparaiso@gmail.com</a></p></section>
+    <section aria-labelledby="footer-social-title"><h2 id="footer-social-title">Síguenos</h2><ul class="footer-social-links"><li><a href="https://www.facebook.com/PanelaSanMarcos" target="_blank" rel="noopener noreferrer">Facebook</a></li><li><a href="https://www.instagram.com/panelasanmarco/" target="_blank" rel="noopener noreferrer">Instagram</a></li></ul></section>
+    <p><a href="ayuda.html">Ayuda</a></p><p class="footer-copyright">© 2026 Panela San Marcos</p>
+  </div></footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/supabase-config.js"></script><script src="js/productos.js"></script><script src="js/store.js"></script><script src="js/app.js"></script><script src="js/perfil.js"></script>
 </body></html>

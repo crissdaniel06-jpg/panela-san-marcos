@@ -65,6 +65,15 @@
             <h2 id="catalog-title" class="visually-hidden">Catálogo de productos</h2>
 
             <div class="catalog-toolbar">
+                <div class="catalog-sort-control">
+                    <label class="catalog-sort-label" for="catalog-sort">Ordenar</label>
+                    <select id="catalog-sort" class="catalog-sort">
+                        <option value="recommended">Recomendados</option>
+                        <option value="price-asc">Precio: menor a mayor</option>
+                        <option value="price-desc">Precio: mayor a menor</option>
+                        <option value="name-asc">Nombre: A a Z</option>
+                    </select>
+                </div>
                 <div class="category-filters" role="group" aria-label="Filtrar productos por categoría">
                     <button type="button" class="filter-button" data-category="all" aria-pressed="true">Todos</button>
                     <button type="button" class="filter-button" data-category="panela" aria-pressed="false">Panela</button>
@@ -80,6 +89,7 @@
             </div>
 
             <p class="visually-hidden" id="catalog-count" role="status" aria-live="polite"></p>
+            <p class="catalog-connection-status" id="catalog-connection-status" role="status" aria-live="polite"></p>
             <div class="products-grid catalog-grid" id="catalog-results"></div>
             <div class="catalog-empty" id="catalog-empty" hidden>
                 <p>No encontramos productos que coincidan con tu búsqueda.</p>

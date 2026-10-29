@@ -5,7 +5,6 @@
         return;
     }
 
-    const cart = window.PanelaStore.getCart();
     const emptyState = document.getElementById("checkout-empty");
     const checkoutContent = document.getElementById("checkout-content");
     const feedback = document.getElementById("checkout-feedback");
@@ -13,6 +12,15 @@
     const shippingStatus = document.getElementById("shipping-status");
     const destinationRow = document.getElementById("checkout-destination-row");
     const guestPrompt = document.querySelector("[data-checkout-guest]");
+
+    const productsLoad = await window.PanelaProductsReady;
+    if (!productsLoad.ok) {
+        emptyState.hidden = false;
+        emptyState.querySelector("h2").textContent = "No podemos verificar el catálogo";
+        emptyState.querySelector("p").textContent = "Tu carrito se conserva. Vuelve a intentarlo cuando se restablezca la conexión.";
+        return;
+    }
+    const cart = window.PanelaStore.getCart();
 
     if (cart.length === 0) {
         emptyState.hidden = false;
@@ -27,8 +35,9 @@
         form.hidden = true;
         return;
     }
-    const { data: { session: initialSession } } = await window.supabaseClient.auth.getSession();
-    window.PanelaAuthUser = initialSession?.user ? { id: initialSession.user.id, email: initialSession.user.email, firstName: initialSession.user.user_metadata?.first_name || "" } : null;
+    await window.PanelaAuthReady;
+    const { data: { user: initialUser } } = await window.supabaseClient.auth.getUser();
+    window.PanelaAuthUser = initialUser ? { id: initialUser.id, email: initialUser.email, firstName: "", lastName: "" } : null;
     const currentUser = window.PanelaStore.getCurrentUser();
     guestPrompt.hidden = Boolean(currentUser);
     if (!currentUser) {
@@ -39,9 +48,21 @@
     }
 
     if (currentUser) {
-        document.getElementById("first-name").value = currentUser.firstName;
-        document.getElementById("last-name").value = currentUser.lastName;
-        document.getElementById("email").value = currentUser.email;
+        const { data: profile, error: profileError } = await window.supabaseClient
+            .from("profiles")
+            .select("first_name,last_name,phone,address,city")
+            .eq("id", currentUser.id)
+            .maybeSingle();
+        if (profileError) {
+            feedback.textContent = "No se pudieron cargar tus datos guardados. Puedes completar los campos manualmente.";
+        } else if (profile) {
+            document.getElementById("first-name").value = profile.first_name || "";
+            document.getElementById("last-name").value = profile.last_name || "";
+            document.getElementById("phone").value = profile.phone || "";
+            document.getElementById("address").value = profile.address || "";
+            document.getElementById("city").value = profile.city || "";
+        }
+        document.getElementById("email").value = currentUser.email || "";
     }
 
     function money(amount) {
@@ -135,7 +156,7 @@
 
     const paymentOptions = [...form.querySelectorAll('[name="metodoPago"]')];
     const transferInfo = document.getElementById("transfer-info");
-    const transferDialogEnabled = true;
+    const transferDialogEnabled = false;
     const transferDialog = document.getElementById("transfer-dialog");
     const receiptInput = document.getElementById("receipt-upload");
     const receiptPreview = document.getElementById("receipt-preview");
@@ -148,7 +169,7 @@
 
     function updatePaymentGuidance() {
         const transferSelected = document.getElementById("payment-transfer").checked;
-        transferInfo.textContent = "Simulación académica. No se realiza ni verifica una transferencia real; el comprobante se recibirá en almacenamiento privado.";
+        transferInfo.textContent = "Las transferencias están temporalmente deshabilitadas mientras se confirman los datos de pago.";
         transferInfo.hidden = !transferSelected;
     }
 
@@ -164,6 +185,15 @@
     function validateAndCreateOrder() {
         feedback.textContent = "";
         const invalidControls = [];
+
+        const cartStockMismatch = window.PanelaStore.getCart().find(item => {
+            const product = window.PanelaStore.getProduct(item.id);
+            return !product || item.quantity > product.stock;
+        });
+        if (cartStockMismatch) {
+            feedback.textContent = "El stock disponible cambió. Revisa las cantidades en tu carrito antes de continuar.";
+            return null;
+        }
 
         fields.forEach(field => {
             const control = document.getElementById(field.id);
@@ -228,13 +258,30 @@
             createdAt: new Date().toISOString(),
             status: "PENDIENTE",
             paymentStatus: "PENDIENTE",
-            requestId: crypto.randomUUID()
+            requestId: null
         };
 
         return order;
     }
 
+    async function assignRequestId(order) {
+        const signature = JSON.stringify({
+            userId: window.PanelaStore.getCurrentUser().id,
+            items: order.items.map(({ id, quantity }) => ({ id, quantity })),
+            city: order.destination,
+            paymentMethod: order.paymentMethod,
+            customer: order.customer
+        });
+        const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(signature));
+        const signatureKey = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+        const storageKey = `panela-order-request:${signatureKey}`;
+        order.requestId = localStorage.getItem(storageKey) || sessionStorage.getItem(storageKey) || crypto.randomUUID();
+        localStorage.setItem(storageKey, order.requestId);
+        order.requestStorageKey = storageKey;
+    }
+
     let submitting = false;
+    let preparingOrder = false;
     async function completeOrder() {
         if (!pendingOrder || submitting) return;
         submitting = true;
@@ -244,6 +291,16 @@
         try {
             const { data: { session } } = await client.auth.getSession();
             if (!session) throw new Error("Tu sesión expiró. Inicia sesión nuevamente.");
+            const savedProfile = await client.from("profiles").upsert({
+                id: session.user.id,
+                first_name: pendingOrder.customer.firstName,
+                last_name: pendingOrder.customer.lastName,
+                phone: pendingOrder.customer.phone,
+                address: pendingOrder.customer.address,
+                city: pendingOrder.customer.city,
+                updated_at: new Date().toISOString()
+            });
+            if (savedProfile.error) throw savedProfile.error;
             const orderInput = {
                 p_items: pendingOrder.items.map(item => ({ id: item.id, quantity: item.quantity })),
                 p_request_id: pendingOrder.requestId,
@@ -251,37 +308,120 @@
                 p_payment_method: pendingOrder.paymentMethod,
                 p_customer: pendingOrder.customer
             };
+            if (pendingOrder.paymentMethod !== "Pago contra entrega") {
+                throw new Error("Ese método de pago no está disponible. Selecciona pago contra entrega.");
+            }
             const { data: orderId, error } = await client.rpc("create_order", orderInput);
-            if (error) throw error;
-            pendingOrder.reference = orderId;
+            if (error) throw new Error(orderErrorMessage(error));
+            if (typeof orderId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId)) {
+                throw new Error("El servidor no devolvió un identificador de pedido válido. Conservamos tu carrito para que puedas reintentar sin duplicar el pedido.");
+            }
+            const { data: savedOrder, error: savedOrderError } = await client.from("orders")
+                .select("id,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,unit_price,quantity,line_subtotal)")
+                .eq("id", orderId).single();
+            if (savedOrderError) throw savedOrderError;
+            pendingOrder.reference = savedOrder.id;
+            pendingOrder.status = savedOrder.status;
+            pendingOrder.subtotal = Number(savedOrder.subtotal);
+            pendingOrder.shipping = Number(savedOrder.shipping);
+            pendingOrder.total = Number(savedOrder.total);
+            pendingOrder.paymentMethod = savedOrder.payment_method;
+            pendingOrder.paymentStatus = savedOrder.payment_status;
+            pendingOrder.destination = savedOrder.delivery_city;
+            pendingOrder.createdAt = savedOrder.created_at;
+            pendingOrder.customer = {
+                firstName: savedOrder.customer_first_name,
+                lastName: savedOrder.customer_last_name,
+                email: savedOrder.customer_email,
+                phone: savedOrder.customer_phone,
+                address: savedOrder.delivery_address,
+                city: savedOrder.delivery_city
+            };
+            pendingOrder.items = savedOrder.order_items.map(item => ({
+                id: item.product_id,
+                name: item.product_name,
+                presentation: window.PanelaStore.getProduct(item.product_id)?.presentacion || "",
+                price: Number(item.unit_price),
+                quantity: Number(item.quantity),
+                subtotal: Number(item.line_subtotal)
+            }));
             if (pendingOrder.paymentMethod === "Transferencia bancaria") {
                 const file = receiptInput.files[0];
                 if (!file) throw new Error("Adjunta el comprobante para continuar.");
-                const path = `${session.user.id}/${orderId}/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-                const upload = await client.storage.from("transfer-receipts").upload(path, file, { contentType: file.type, upsert: false });
-                if (upload.error) throw upload.error;
-                const receipt = await client.from("transfer_receipts").insert({ order_id: orderId, user_id: session.user.id, storage_path: path });
-                if (receipt.error) throw receipt.error;
-                pendingOrder.paymentStatus = "COMPROBANTE_RECIBIDO";
+                const path = `${session.user.id}/${orderId}/receipt`;
+                const { data: existingReceipt, error: receiptLookupError } = await client.from("transfer_receipts")
+                    .select("id,storage_path").eq("order_id", orderId).eq("user_id", session.user.id).maybeSingle();
+                if (receiptLookupError) throw receiptLookupError;
+                if (!existingReceipt) {
+                    const folder = `${session.user.id}/${orderId}`;
+                    const { data: files, error: listError } = await client.storage.from("transfer-receipts").list(folder);
+                    if (listError) throw listError;
+                    const alreadyUploaded = files?.some(item => item.name === "receipt");
+                    if (!alreadyUploaded) {
+                        const upload = await client.storage.from("transfer-receipts").upload(path, file, { contentType: file.type, upsert: false });
+                        if (upload.error) throw upload.error;
+                    }
+                    const receipt = await client.from("transfer_receipts").insert({ order_id: orderId, user_id: session.user.id, storage_path: path });
+                    if (receipt.error) {
+                        await client.storage.from("transfer-receipts").remove([path]);
+                        throw receipt.error;
+                    }
+                }
+                pendingOrder.paymentStatus = "PENDIENTE_VERIFICACION";
             }
             pendingOrder.createdAt = new Date().toISOString();
             if (!window.PanelaStore.saveOrder(pendingOrder)) throw new Error("Pedido creado, pero no se pudo preparar el resumen local. Contacta soporte con este identificador: " + orderId);
             window.PanelaStore.clearCart();
+            localStorage.removeItem(pendingOrder.requestStorageKey);
+            sessionStorage.removeItem(pendingOrder.requestStorageKey);
             window.location.assign("confirmacion.html");
         } catch (error) {
-            const message = error.message || "No se pudo crear el pedido. Inténtalo de nuevo.";
+            const message = error?.code ? orderErrorMessage(error) : (error.message || "No se pudo crear el pedido. Inténtalo de nuevo.");
+            feedback.textContent = message;
             if (pendingOrder.paymentMethod === "Transferencia bancaria") receiptError.textContent = message;
-            else feedback.textContent = message;
             submitting = false;
             if (submitButton) submitButton.disabled = false;
         }
     }
 
+    function orderErrorMessage(error) {
+        const message = String(error?.message || "");
+        const knownErrors = {
+            AUTH_REQUIRED: "Tu sesión no está activa. Inicia sesión nuevamente.",
+            INVALID_CITY: "No podemos entregar en esa ciudad. Selecciona una ciudad disponible.",
+            INVALID_PAYMENT_METHOD: "Selecciona un método de pago disponible.",
+            INVALID_CUSTOMER_DATA: "Revisa tu nombre, apellido, correo, teléfono y dirección.",
+            EMPTY_CART: "Tu carrito está vacío.",
+            INVALID_QUANTITY: "Revisa las cantidades de los productos.",
+            UNAVAILABLE_PRODUCT: "El stock cambió. Actualiza tu carrito antes de volver a intentar.",
+            REQUEST_ID_REQUIRED: "No se pudo preparar un reintento seguro. Recarga la página y vuelve a intentar.",
+            TRANSFER_UNAVAILABLE: "La transferencia bancaria está temporalmente deshabilitada. Selecciona pago contra entrega."
+        };
+        const token = message.match(/\b[A-Z_]+\b/)?.[0];
+        if (token && knownErrors[token]) return knownErrors[token];
+        if (/null value in column "id" of relation "orders"/i.test(message)) {
+            return "El servidor rechazó el identificador del pedido. No se borró tu carrito. Conservamos la referencia de reintento; vuelve a intentarlo más tarde y contacta a la tienda si el problema continúa.";
+        }
+        if (error?.code === "23505") return "Este pedido ya se había recibido. Conservamos su referencia para evitar duplicarlo; vuelve a cargar la página para revisar su estado.";
+        if (error?.code === "PGRST202" || error?.code === "PGRST203") return "La conexión del checkout está desactualizada. Recarga la página e inténtalo nuevamente.";
+        if (/fetch|network|timeout|offline/i.test(message)) return "Se perdió la conexión. Tu carrito y la referencia de reintento se conservaron; vuelve a intentar cuando tengas conexión.";
+        return "No se pudo crear el pedido. Tu carrito se conservó. Inténtalo de nuevo o contacta a la tienda si persiste.";
+    }
+
     form.addEventListener("submit", async event => {
         event.preventDefault();
-        if (transferDialog.open) return;
+        if (transferDialog.open || preparingOrder || submitting) return;
+        preparingOrder = true;
         const order = validateAndCreateOrder();
-        if (!order) return;
+        if (!order) { preparingOrder = false; return; }
+        try {
+            await assignRequestId(order);
+        } catch {
+            feedback.textContent = "No se pudo preparar el pedido. Inténtalo nuevamente.";
+            preparingOrder = false;
+            return;
+        }
+        preparingOrder = false;
 
         if (transferDialogEnabled && order.paymentMethod === "Transferencia bancaria") {
             if (!receiptInput.files.length) {

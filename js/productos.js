@@ -107,62 +107,47 @@ const nombresCategorias = {
 window.PANELA_PRODUCTS = productos;
 window.PANELA_CATEGORY_NAMES = nombresCategorias;
 
-const productosDestacados = productos.slice(0, 4);
-
 const contenedorProductos = document.getElementById("featured-products");
 
-if (contenedorProductos) {
-
-    productosDestacados.forEach(producto => {
-
-        const tarjeta = document.createElement("article");
-
-        tarjeta.classList.add("product-card");
-
-        tarjeta.innerHTML = `
-            <a
-                href="producto.html?id=${producto.id}"
-                class="product-image-link"
-            >
-                <img
-                    src="${producto.imagen}"
-                    alt="${producto.alt}"
-                    class="product-image"
-                    loading="lazy"
-                    width="600"
-                    height="600"
-                >
-            </a>
-
-            <div class="product-info">
-
-                <span class="product-category">
-                    ${nombresCategorias[producto.categoria]}
-                </span>
-
-                <h3>
-                    ${producto.nombre}
-                </h3>
-
-                <p class="product-presentation">
-                    ${producto.presentacion}
-                </p>
-
-                <p class="product-price">
-                    Precio<br>
-                    $${producto.precio.toFixed(2)}
-                </p>
-
-                <a
-                    href="producto.html?id=${producto.id}"
-                    class="product-view-link"
-                >
-                    Ver ${producto.nombre} →
-                </a>
-
-            </div>
-        `;
-
-        contenedorProductos.appendChild(tarjeta);
-    });
+function renderFeaturedProducts() {
+    if (!contenedorProductos) return;
+    const featured = (window.PANELA_PRODUCTS || []).slice(0, 4);
+    contenedorProductos.replaceChildren(...featured.map(producto => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+        const imageLink = document.createElement("a");
+        imageLink.href = `producto.html?id=${producto.id}`;
+        imageLink.className = "product-image-link";
+        const image = document.createElement("img");
+        image.src = producto.imagen;
+        image.alt = producto.alt;
+        image.className = "product-image";
+        image.loading = "lazy";
+        image.width = 600;
+        image.height = 600;
+        imageLink.append(image);
+        const info = document.createElement("div");
+        info.className = "product-info";
+        const category = document.createElement("span");
+        category.className = "product-category";
+        category.textContent = nombresCategorias[producto.categoria] || "Producto";
+        const title = document.createElement("h3");
+        title.textContent = producto.nombre;
+        const presentation = document.createElement("p");
+        presentation.className = "product-presentation";
+        presentation.textContent = producto.presentacion;
+        const price = document.createElement("p");
+        price.className = "product-price";
+        price.textContent = `Precio · $${producto.precio.toFixed(2)}`;
+        const view = document.createElement("a");
+        view.href = imageLink.href;
+        view.className = "product-view-link";
+        view.textContent = `Ver ${producto.nombre} →`;
+        info.append(category, title, presentation, price, view);
+        card.append(imageLink, info);
+        return card;
+    }));
 }
+
+renderFeaturedProducts();
+window.addEventListener("panela:productschange", renderFeaturedProducts);

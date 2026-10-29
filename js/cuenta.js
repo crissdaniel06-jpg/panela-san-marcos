@@ -2,8 +2,9 @@
     const returnTargets = new Set(["index.html", "productos.html", "carrito.html", "checkout.html", "cuenta.html", "favoritos.html"]);
     const parameters = new URLSearchParams(window.location.search);
     const requestedReturn = parameters.get("return");
-    const safeProductReturn = /^producto\.html\?id=\d+$/.test(requestedReturn || "");
-    const returnTo = returnTargets.has(requestedReturn) || safeProductReturn ? requestedReturn : "index.html";
+    const safeProductReturn = /^producto\.html\?id=\d+(?:&favorite=1)?$/.test(requestedReturn || "");
+    const safeCatalogFavoriteReturn = /^productos\.html\?favorite=\d+$/.test(requestedReturn || "");
+    const returnTo = returnTargets.has(requestedReturn) || safeProductReturn || safeCatalogFavoriteReturn ? requestedReturn : "index.html";
     const loginForm = document.getElementById("login-form");
     const registerForm = document.getElementById("register-form");
 
@@ -203,7 +204,8 @@
                 firstName: values["register-first-name"],
                 lastName: values["register-last-name"],
                 email: values["register-email"],
-                password: values["register-password"]
+                password: values["register-password"],
+                returnTo
             });
 
             if (result.error) {
@@ -213,8 +215,14 @@
                 return;
             }
 
-            feedback.textContent = "Solicitud enviada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.";
-            window.PanelaUI.showToast("Revisa tu correo para confirmar la cuenta.");
+            if (result.data?.session) {
+                feedback.textContent = "Cuenta creada correctamente.";
+                window.PanelaUI.showToast("Tu cuenta está lista.");
+                window.setTimeout(() => window.location.assign(returnTo), 650);
+            } else {
+                feedback.textContent = "Solicitud enviada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.";
+                window.PanelaUI.showToast("Revisa tu correo para confirmar la cuenta.");
+            }
         });
     }
 })();
