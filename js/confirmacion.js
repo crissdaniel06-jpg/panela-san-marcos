@@ -14,10 +14,7 @@
         return;
     }
 
-    const [productsLoad, orderResult] = await Promise.all([
-        window.PanelaProductsReady,
-        window.PanelaStore.getOrderById(latestOrder.reference)
-    ]);
+    const orderResult = await window.PanelaStore.getOrderById(latestOrder.reference);
     if (orderResult.error || !orderResult.data) {
         emptyState.hidden = false;
         emptyState.querySelector("p").textContent = "No pudimos consultar el pedido. Inicia sesión con la cuenta que lo realizó y vuelve a intentarlo.";
@@ -45,7 +42,8 @@
         items: (saved.order_items || []).map(item => ({
             id: item.product_id,
             name: item.product_name,
-            presentation: productsLoad.ok ? window.PanelaStore.getProduct(item.product_id)?.presentacion || "" : "",
+            presentation: item.presentation || "",
+            unitPrice: Number(item.unit_price),
             quantity: Number(item.quantity),
             subtotal: Number(item.line_subtotal)
         }))
@@ -63,6 +61,7 @@
     content.hidden = false;
     document.getElementById("order-reference").textContent = order.reference;
     document.getElementById("confirmation-customer").textContent = customerName;
+    document.getElementById("confirmation-seller").textContent = "Panela San Marcos · 097 950 9568 · imporparaiso@gmail.com";
     document.getElementById("confirmation-phone").textContent = order.customer.phone;
     document.getElementById("confirmation-email").textContent = order.customer.email;
     document.getElementById("confirmation-destination").textContent = order.destination || order.customer.city || "No especificado";
@@ -94,8 +93,8 @@
     const canCancelOrder = orderStatusValue === "PENDIENTE";
 
     orderStatus.textContent = orderStatusValue === "PENDIENTE" ? "Pendiente" : orderStatusValue === "CANCELADO" ? "Cancelado" : orderStatusValue;
-    cancelButton.hidden = orderIsCancelled;
-    cancelPolicy.hidden = orderIsCancelled;
+    cancelButton.hidden = !canCancelOrder;
+    cancelPolicy.hidden = canCancelOrder;
     if (orderIsCancelled) {
         document.getElementById("confirmation-tag").textContent = "PEDIDO CANCELADO";
         document.getElementById("confirmation-title").textContent = "Pedido cancelado";
@@ -118,10 +117,7 @@
 
         cancelFeedback.hidden = true;
         cancelFeedback.textContent = "";
-        const paidByTransfer = order.paymentMethod === "Transferencia bancaria" && order.paymentStatus === "PAGADO";
-        document.getElementById("cancel-order-description").textContent = paidByTransfer
-            ? "Puedes cancelar el pedido porque aún está pendiente. Como ya pagaste por transferencia, tendrás que coordinar el reembolso con la tienda. Esta acción no se puede deshacer."
-            : "Puedes cancelar el pedido mientras esté pendiente, antes de que empiece la preparación. Esta acción no se puede deshacer.";
+        document.getElementById("cancel-order-description").textContent = "Puedes cancelar el pedido mientras esté pendiente. La preparación se detendrá y el inventario reservado volverá a estar disponible. Esta acción no se puede deshacer. Si existiera un pago confirmado, la cancelación no procesa un reembolso automático.";
         cancelDialog.showModal();
         backButton.focus();
     });
@@ -175,7 +171,7 @@
         const description = document.createElement("span");
         const subtotal = document.createElement("strong");
 
-        description.textContent = `${item.name} · ${item.presentation} × ${item.quantity}`;
+        description.textContent = `${item.name}${item.presentation ? ` · ${item.presentation}` : ""} × ${item.quantity} · ${money(item.unitPrice)} c/u`;
         subtotal.textContent = money(item.subtotal);
         listItem.append(description, subtotal);
         itemList.append(listItem);

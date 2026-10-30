@@ -59,12 +59,13 @@
             <p class="confirmation-lead" id="confirmation-lead">Tu pedido ha sido registrado correctamente.</p>
             <p class="order-reference">Pedido <strong id="order-reference"></strong></p>
             <p id="order-status" class="order-status" role="status" aria-live="polite" tabindex="-1">Pedido recibido</p>
-            <p>Gracias por elegir Panela San Marcos.</p>
+            <p>Resumen de pedido; no es una factura tributaria ni un documento fiscal autorizado.</p>
 
             <div class="confirmation-details">
                 <section aria-labelledby="customer-details-title">
                     <h2 id="customer-details-title">Datos del pedido</h2>
                     <dl class="confirmation-data">
+                        <div><dt>Vendedor</dt><dd id="confirmation-seller">Panela San Marcos</dd></div>
                         <div><dt>Cliente</dt><dd id="confirmation-customer"></dd></div>
                         <div><dt>Teléfono</dt><dd id="confirmation-phone"></dd></div>
                         <div><dt>Correo</dt><dd id="confirmation-email"></dd></div>
@@ -98,7 +99,7 @@
 
         <dialog id="cancel-order-dialog" class="cancel-order-dialog" aria-labelledby="cancel-order-title" aria-describedby="cancel-order-description">
             <h2 id="cancel-order-title">¿Cancelar este pedido?</h2>
-            <p id="cancel-order-description">Puedes cancelar el pedido mientras esté pendiente, antes de que empiece la preparación. Si pagaste por transferencia, tendrás que coordinar el reembolso con la tienda. Esta acción no se puede deshacer.</p>
+            <p id="cancel-order-description">Puedes cancelar el pedido mientras esté pendiente. La preparación se detendrá y el inventario reservado volverá a estar disponible. Esta acción no se puede deshacer. Si existiera un pago confirmado, la cancelación no procesa un reembolso automático.</p>
             <dl class="cancel-order-summary">
                 <div><dt>Número de pedido</dt><dd id="cancel-order-number"></dd></div>
                 <div><dt>Total</dt><dd id="cancel-order-total"></dd></div>
