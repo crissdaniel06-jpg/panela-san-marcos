@@ -295,3 +295,5 @@ Se aplicó a `nrvqfuzragjsxuvqljpb` la migración registrada `20261030015540 / h
 ## Pedido de prueba confirmado por el usuario — 30 de octubre de 2026
 
 El usuario confirmó el envío desde la página de checkout. La pantalla `confirmacion.html` mostró “¡Pedido confirmado!”, estado `PENDIENTE`, una línea de Panela molida granulada (500 g × 1) a `$2.50`, envío `$1.50` y total `$4.00`; el carrito quedó en 0 unidades. La consulta de solo lectura del último pedido en Supabase devolvió una sola fila nueva: método `Pago contra entrega`, estado del pedido y del pago `PENDIENTE`, pago por `$4.00`, una línea con snapshot de nombre, presentación, precio y cantidad, y stock actual del producto 1 en 29. El total de pedidos ahora es 2. No se hizo ningún segundo envío ni se probó idempotencia mediante reintento; no se canceló la orden ni se creó comprobante. Transferencia permanece deshabilitada.
+
+La revisión posterior en `cuenta.html` mostró los dos pedidos propios, con el pedido de prueba de `$4.00` primero; el carrito permaneció vacío. No se pulsó ninguna acción de cancelación.
