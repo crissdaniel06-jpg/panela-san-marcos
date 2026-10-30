@@ -47,10 +47,9 @@
 
             return `
                 <article class="product-card">
-                    <button type="button" class="favorite-toggle${favoriteIds.has(product.id) ? " is-active" : ""}" data-favorite-product="${product.id}" aria-pressed="${favoriteIds.has(product.id)}" aria-label="${favoriteIds.has(product.id) ? `Quitar ${name} de favoritos` : `Añadir ${name} a favoritos`}">${favoriteIds.has(product.id) ? "★" : "☆"}</button>
-                    <a href="producto.html?id=${product.id}" class="product-image-link">
+                    <div class="product-image-frame">
                         <img src="${image}" alt="${alt}" class="product-image" loading="lazy" width="600" height="600">
-                    </a>
+                    </div>
                     <div class="product-info">
                         <span class="product-category">${category}</span>
                         <h3>${name}</h3>
@@ -58,7 +57,8 @@
                         <p class="product-price"><span class="product-price-label">Precio</span><strong>$${product.precio.toFixed(2)}</strong></p>
                         ${available === 0 ? '<p class="stock-message">No puedes agregar más unidades disponibles de este producto.</p>' : ""}
                         <div class="product-actions">
-                            <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver ${name}">Ver producto</a>
+                            <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver producto: ${name}">Ver producto</a>
+                            <button type="button" class="favorite-toggle${favoriteIds.has(product.id) ? " is-active" : ""}" data-favorite-product="${product.id}" aria-pressed="${favoriteIds.has(product.id)}" aria-label="${favoriteIds.has(product.id) ? `Quitar ${name} de favoritos` : `Añadir ${name} a favoritos`}">${favoriteIds.has(product.id) ? "★" : "☆"}</button>
                             <button type="button" class="add-to-cart-button" data-add-product="${product.id}" aria-label="${addLabel}" ${available === 0 ? "disabled" : ""}>
                                 Agregar al carrito
                             </button>

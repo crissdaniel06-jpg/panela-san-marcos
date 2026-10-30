@@ -3021,3 +3021,143 @@ select:focus-visible {
         padding: 20px;
     }
 }
+
+/* Product and account accessibility refinements */
+.product-card {
+    overflow: visible;
+}
+
+.product-image-frame {
+    display: block;
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+    background-color: #f7f5ed;
+}
+
+.product-card .product-price {
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+}
+
+.product-card .product-price strong {
+    font-size: clamp(2.4rem, 4vw, 2.6rem);
+    line-height: 1.08;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.detail-price strong {
+    font-size: clamp(3rem, 5vw, 3.2rem);
+    line-height: 1.08;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.detail-price > span {
+    color: var(--color-gris);
+    font-size: .9rem;
+    font-weight: 500;
+}
+
+.product-actions .favorite-toggle {
+    justify-self: start;
+}
+
+.account-shortcuts a[href="favoritos.html"] {
+    display: inline-flex;
+    width: min(100%, 340px);
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border: 1px solid var(--color-vino);
+    border-radius: 6px;
+    background: var(--color-naranja);
+    color: var(--color-negro);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color .18s ease, transform .18s ease;
+}
+
+.account-shortcuts a[href="favoritos.html"]:hover {
+    background: #f4ad5c;
+}
+
+.account-shortcuts a[href="favoritos.html"]:active {
+    transform: translateY(1px);
+}
+
+/* A link has no native disabled state; this rule is for genuinely disabled buttons. */
+.product-actions button:disabled {
+    border-color: #5F1B32;
+    background: #e8e2e4;
+    color: #5a5557;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* Keep keyboard focus in the brand wine color across legacy and newer controls. */
+:focus-visible {
+    outline: 3px solid #5F1B32 !important;
+    outline-offset: 3px !important;
+}
+
+.header-search-inline:focus-within {
+    outline: 3px solid #5F1B32;
+    outline-offset: 3px;
+    box-shadow: none;
+}
+
+.product-card:focus-within {
+    z-index: 2;
+    outline: 2px solid #5F1B32;
+    outline-offset: 5px;
+}
+
+.site-footer :focus-visible {
+    outline-color: #FBF7E4 !important;
+}
+
+@media (max-width: 900px) and (min-width: 561px) {
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1150px) and (min-width: 901px) {
+    .products-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .product-card .product-info {
+        padding: 16px;
+    }
+
+    .product-card .product-price strong {
+        font-size: 2.6rem;
+    }
+
+    .account-shortcuts a[href="favoritos.html"] {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-card,
+    .product-card *,
+    .account-shortcuts a[href="favoritos.html"] {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
