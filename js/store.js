@@ -340,46 +340,39 @@
         });
     } else window.PanelaAuthReady = Promise.resolve(null);
 
-    window.PanelaProductsReady = window.supabaseClient
-        ? window.supabaseClient.from("products")
-            .select("id,name,description,price,category,presentation,image_path,stock,available")
-            .eq("available", true)
-            .order("id")
-            .then(({ data, error }) => {
-                if (error) throw error;
-                const knownProducts = new Map((window.PANELA_PRODUCTS || []).map(product => [Number(product.id), product]));
-                window.PANELA_PRODUCTS = (data || []).map(row => {
-                    const known = knownProducts.get(Number(row.id));
-                    const image = typeof row.image_path === "string" && /^img\/[\w./-]+$/.test(row.image_path) && !row.image_path.includes("..")
-                        ? row.image_path
-                        : known?.imagen || "";
-                    return {
-                        id: Number(row.id),
-                        nombre: String(row.name || ""),
-                        categoria: String(row.category || ""),
-                        precio: Number(row.price),
-                        presentacion: String(row.presentation || ""),
-                        stock: Math.max(0, Number(row.stock) || 0),
-                        descripcion: String(row.description || ""),
-                        imagen: image,
-                        alt: known?.alt || String(row.name || "Producto")
-                    };
-                }).filter(product => Number.isInteger(product.id) && product.nombre && Number.isFinite(product.precio) && product.imagen);
-                window.dispatchEvent(new Event("panela:productschange"));
-                return { ok: true };
-            })
-            .catch(error => {
-                window.PANELA_PRODUCTS = [];
-                window.PanelaProductsError = error;
-                window.dispatchEvent(new Event("panela:productschange"));
-                return { ok: false, error };
-            })
-        : Promise.resolve().then(() => {
-            window.PANELA_PRODUCTS = [];
-            window.PanelaProductsError = new Error("No hay conexión a Supabase.");
+    async function refreshProducts() {
+        if (!window.supabaseClient) return { ok: false, error: new Error("No hay conexión a Supabase.") };
+        try {
+            const { data, error } = await window.supabaseClient.from("products")
+                .select("id,name,description,price,category,presentation,image_path,stock,available")
+                .eq("available", true)
+                .order("id");
+            if (error) throw error;
+            const knownProducts = new Map((window.PANELA_PRODUCTS || []).map(product => [Number(product.id), product]));
+            window.PANELA_PRODUCTS = (data || []).map(row => {
+                const known = knownProducts.get(Number(row.id));
+                const image = typeof row.image_path === "string" && /^img\/[\w./-]+$/.test(row.image_path) && !row.image_path.includes("..")
+                    ? row.image_path : known?.imagen || "";
+                return { id:Number(row.id), nombre:String(row.name || ""), categoria:String(row.category || ""),
+                    precio:Number(row.price), presentacion:String(row.presentation || ""), stock:Math.max(0,Number(row.stock)||0),
+                    descripcion:String(row.description || ""), imagen:image, alt:known?.alt || String(row.name || "Producto") };
+            }).filter(product => Number.isInteger(product.id) && product.nombre && Number.isFinite(product.precio) && product.imagen);
+            window.PanelaProductsError = null;
             window.dispatchEvent(new Event("panela:productschange"));
-            return { ok: false, error: window.PanelaProductsError };
-        });
+            return { ok:true };
+        } catch (error) { window.PanelaProductsError=error; return { ok:false,error }; }
+    }
+
+    window.PanelaProductsReady = refreshProducts();
+    if (window.supabaseClient) {
+        let refreshTimer;
+        window.supabaseClient.channel("public-products-inventory")
+            .on("postgres_changes", { event:"UPDATE", schema:"public", table:"products" }, () => {
+                clearTimeout(refreshTimer); refreshTimer=setTimeout(refreshProducts,120);
+            }).subscribe();
+        document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") refreshProducts(); });
+        window.addEventListener("focus", refreshProducts);
+    }
 
     window.PanelaStore = {
         getProduct,
