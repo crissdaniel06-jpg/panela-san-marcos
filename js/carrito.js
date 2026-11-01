@@ -85,7 +85,10 @@
         const action = button.dataset.cartAction;
 
         if (action === "remove") {
-            window.PanelaStore.remove(id);
+            if (!window.PanelaStore.remove(id)) {
+                window.PanelaUI.showToast("No se pudo actualizar el carrito. Inténtalo de nuevo.", true);
+                return;
+            }
             window.PanelaUI.showToast(`✓ ${product.nombre} se eliminó del carrito.`);
         } else {
             const nextQuantity = item.quantity + (action === "increase" ? 1 : -1);

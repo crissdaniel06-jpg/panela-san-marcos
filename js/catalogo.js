@@ -47,6 +47,8 @@
 
             return `
                 <article class="product-card">
+                    <a class="product-card-link" href="producto.html?id=${product.id}" aria-label="Abrir el detalle de ${name}"></a>
+                    <button type="button" class="favorite-toggle${favoriteIds.has(product.id) ? " is-active" : ""}" data-favorite-product="${product.id}" aria-pressed="${favoriteIds.has(product.id)}" aria-label="${favoriteIds.has(product.id) ? `Quitar ${name} de favoritos` : `Añadir ${name} a favoritos`}">${favoriteIds.has(product.id) ? "★" : "☆"}</button>
                     <div class="product-image-frame">
                         <img src="${image}" alt="${alt}" class="product-image" loading="lazy" width="600" height="600">
                     </div>
@@ -57,8 +59,7 @@
                         <p class="product-price"><span class="product-price-label">Precio</span><strong>$${product.precio.toFixed(2)}</strong></p>
                         ${available === 0 ? '<p class="stock-message">No puedes agregar más unidades disponibles de este producto.</p>' : ""}
                         <div class="product-actions">
-                            <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver producto: ${name}">Ver producto</a>
-                            <button type="button" class="favorite-toggle${favoriteIds.has(product.id) ? " is-active" : ""}" data-favorite-product="${product.id}" aria-pressed="${favoriteIds.has(product.id)}" aria-label="${favoriteIds.has(product.id) ? `Quitar ${name} de favoritos` : `Añadir ${name} a favoritos`}">${favoriteIds.has(product.id) ? "★" : "☆"}</button>
+                            <a href="producto.html?id=${product.id}" class="product-view-link" aria-label="Ver ficha completa: ${name}">Ver producto</a>
                             <button type="button" class="add-to-cart-button" data-add-product="${product.id}" aria-label="${addLabel}" ${available === 0 ? "disabled" : ""}>
                                 Agregar al carrito
                             </button>

@@ -98,7 +98,7 @@
         const user = getCurrentUser();
         if (!user || !window.supabaseClient) return authUnavailable();
         const query = window.supabaseClient.from("favorites");
-        return favorite ? query.upsert({ user_id: user.id, product_id: Number(productId) }, { onConflict: "user_id,product_id" }) : query.delete().eq("user_id", user.id).eq("product_id", Number(productId));
+        return favorite ? query.insert({ user_id: user.id, product_id: Number(productId) }) : query.delete().eq("user_id", user.id).eq("product_id", Number(productId));
     }
 
     function getProduct(id) {

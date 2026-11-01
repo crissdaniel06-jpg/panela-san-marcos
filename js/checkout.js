@@ -161,7 +161,6 @@
 
     const paymentOptions = [...form.querySelectorAll('[name="metodoPago"]')];
     const transferInfo = document.getElementById("transfer-info");
-    const transferDialogEnabled = false;
     const transferDialog = document.getElementById("transfer-dialog");
     const receiptInput = document.getElementById("receipt-upload");
     const receiptPreview = document.getElementById("receipt-preview");
@@ -174,7 +173,6 @@
 
     function updatePaymentGuidance() {
         const transferSelected = document.getElementById("payment-transfer").checked;
-        transferInfo.textContent = "Las transferencias están temporalmente deshabilitadas mientras se confirman los datos de pago.";
         transferInfo.hidden = !transferSelected;
     }
 
@@ -313,9 +311,6 @@
                 p_payment_method: pendingOrder.paymentMethod,
                 p_customer: pendingOrder.customer
             };
-            if (pendingOrder.paymentMethod !== "Pago contra entrega") {
-                throw new Error("Ese método de pago no está disponible. Selecciona pago contra entrega.");
-            }
             const { data: orderId, error } = await client.rpc("create_order", orderInput);
             if (error) throw new Error(orderErrorMessage(error));
             if (typeof orderId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(orderId)) {
@@ -428,7 +423,7 @@
         }
         preparingOrder = false;
 
-        if (transferDialogEnabled && order.paymentMethod === "Transferencia bancaria") {
+        if (order.paymentMethod === "Transferencia bancaria") {
             if (!receiptInput.files.length) {
                 pendingOrder = order;
                 dialogTrigger = document.activeElement;
