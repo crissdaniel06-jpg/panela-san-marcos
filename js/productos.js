@@ -7,7 +7,7 @@ const productos = [
         presentacion: "500 g",
         stock: 30,
         descripcion: "Panela natural de caña en presentación granulada, práctica para endulzar bebidas y preparar diferentes recetas.",
-        imagen: "img/productos/panela-molida.png",
+        imagen: "img/productos/panela-molida.webp",
         alt: "Panela molida granulada San Marcos"
     },
 
@@ -19,7 +19,7 @@ const productos = [
         presentacion: "500 g",
         stock: 25,
         descripcion: "Panela tradicional elaborada a partir de caña de azúcar, presentada en bloques para conservar su forma y sabor característico.",
-        imagen: "img/productos/panela-bloque.png",
+        imagen: "img/productos/panela-bloque.webp",
         alt: "Panela en bloque San Marcos"
     },
 
@@ -31,7 +31,7 @@ const productos = [
         presentacion: "500 g",
         stock: 20,
         descripcion: "Panela granulada combinada con canela, con un aroma y sabor especiado que complementa bebidas calientes y preparaciones.",
-        imagen: "img/productos/panela-canela.png",
+        imagen: "img/productos/panela-canela.webp",
         alt: "Panela con canela San Marcos"
     },
 
@@ -43,7 +43,7 @@ const productos = [
         presentacion: "500 g",
         stock: 20,
         descripcion: "Panela combinada con jengibre, una alternativa con un sabor ligeramente picante y aromático.",
-        imagen: "img/productos/panela-jengibre.png",
+        imagen: "img/productos/panela-jengibre.webp",
         alt: "Panela con jengibre San Marcos"
     },
 
@@ -55,7 +55,7 @@ const productos = [
         presentacion: "480 g",
         stock: 18,
         descripcion: "Derivado líquido de la caña de azúcar, de textura espesa y sabor dulce, ideal para acompañar diferentes preparaciones.",
-        imagen: "img/productos/miel-cana.png",
+        imagen: "img/productos/miel-cana.webp",
         alt: "Miel de caña San Marcos"
     },
 
@@ -67,7 +67,7 @@ const productos = [
         presentacion: "300 g",
         stock: 18,
         descripcion: "Derivado concentrado de la caña de azúcar, de color oscuro, textura espesa y sabor intenso.",
-        imagen: "img/productos/melaza-cana.png",
+        imagen: "img/productos/melaza-cana.webp",
         alt: "Melaza de caña San Marcos"
     },
 
@@ -79,7 +79,7 @@ const productos = [
         presentacion: "20 cubitos",
         stock: 25,
         descripcion: "Dulce tradicional de panela en presentación de 20 cubitos, ideal para disfrutar directamente o acompañar bebidas.",
-        imagen: "img/productos/dulce-panela.png",
+        imagen: "img/productos/dulce-panela.webp",
         alt: "Dulce de panela San Marcos"
     },
 
@@ -91,7 +91,7 @@ const productos = [
         presentacion: "25 sobres",
         stock: 15,
         descripcion: "Infusión elaborada con panela y frutas, presentada en sobres individuales para preparar fácilmente una bebida caliente.",
-        imagen: "img/infusion-panela.png",
+        imagen: "img/productos/infusion-panela.webp",
         alt: "Infusión de panela San Marcos"
     }
 ];
@@ -156,3 +156,4 @@ function renderFeaturedProducts() {
 
 renderFeaturedProducts();
 window.addEventListener("panela:productschange", renderFeaturedProducts);
+
