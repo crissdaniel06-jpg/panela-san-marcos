@@ -317,10 +317,11 @@
                 throw new Error("El servidor no devolvió un identificador de pedido válido. Conservamos tu carrito para que puedas reintentar sin duplicar el pedido.");
             }
             const { data: savedOrder, error: savedOrderError } = await client.from("orders")
-                .select("id,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,unit_price,quantity,line_subtotal)")
+                .select("id,public_number,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,unit_price,quantity,line_subtotal)")
                 .eq("id", orderId).single();
             if (savedOrderError) throw savedOrderError;
             pendingOrder.reference = savedOrder.id;
+            pendingOrder.publicNumber = window.PanelaStore.formatOrderNumber(savedOrder.public_number);
             pendingOrder.status = savedOrder.status;
             pendingOrder.subtotal = Number(savedOrder.subtotal);
             pendingOrder.shipping = Number(savedOrder.shipping);

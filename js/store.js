@@ -79,7 +79,7 @@
         const user = getCurrentUser();
         if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar tus pedidos.") };
         return window.supabaseClient.from("orders")
-            .select("id,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,quantity,unit_price,line_subtotal)")
+            .select("id,public_number,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,quantity,unit_price,line_subtotal)")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
             .limit(25);
@@ -89,7 +89,7 @@
         const user = getCurrentUser();
         if (!user || !window.supabaseClient) return { data: null, error: new Error("Inicia sesión para consultar este pedido.") };
         return window.supabaseClient.from("orders")
-            .select("id,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,product_type,presentation,unit_price,quantity,line_subtotal)")
+            .select("id,public_number,status,subtotal,shipping,total,payment_method,payment_status,customer_first_name,customer_last_name,customer_email,customer_phone,delivery_address,delivery_city,created_at,order_items(product_id,product_name,product_type,presentation,unit_price,quantity,line_subtotal)")
             .eq("id", orderId)
             .eq("user_id", user.id)
             .maybeSingle();
@@ -375,6 +375,7 @@
     }
 
     window.PanelaStore = {
+        formatOrderNumber: publicNumber => `PSM-${String(publicNumber).padStart(6, "0")}`,
         getProduct,
         getCart,
         getQuantity,

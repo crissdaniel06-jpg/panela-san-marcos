@@ -23,6 +23,7 @@
     const saved = orderResult.data;
     const order = {
         reference: saved.id,
+        publicNumber: window.PanelaStore.formatOrderNumber(saved.public_number),
         status: saved.status,
         subtotal: Number(saved.subtotal),
         shipping: Number(saved.shipping),
@@ -59,7 +60,7 @@
     const orderDate = new Date(order.createdAt);
 
     content.hidden = false;
-    document.getElementById("order-reference").textContent = order.reference;
+    document.getElementById("order-reference").textContent = order.publicNumber;
     document.getElementById("confirmation-customer").textContent = customerName;
     document.getElementById("confirmation-seller").textContent = "Panela San Marcos · 097 950 9568 · imporparaiso@gmail.com";
     document.getElementById("confirmation-phone").textContent = order.customer.phone;
@@ -105,7 +106,7 @@
         document.getElementById("confirmation-title").textContent = "Estado de tu pedido";
         document.getElementById("confirmation-lead").textContent = "Puedes consultar aquí el estado actual de tu pedido.";
     }
-    document.getElementById("cancel-order-number").textContent = order.reference;
+    document.getElementById("cancel-order-number").textContent = order.publicNumber;
     document.getElementById("cancel-order-total").textContent = money(order.total);
 
     cancelButton.addEventListener("click", () => {
@@ -161,7 +162,7 @@
         cancelButton.hidden = true;
         cancelPolicy.hidden = true;
         cancelDialog.close();
-        window.PanelaUI.showToast(`Tu pedido #${order.reference} ha sido cancelado correctamente.`);
+        window.PanelaUI.showToast(`Tu pedido ${order.publicNumber} ha sido cancelado correctamente.`);
     });
 
     const itemList = document.getElementById("confirmation-items");

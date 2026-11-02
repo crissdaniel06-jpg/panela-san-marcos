@@ -72,14 +72,13 @@
     let saving = false;
     form.querySelectorAll("[data-password-toggle]").forEach(toggle => {
       const input = document.getElementById(toggle.getAttribute("aria-controls"));
-      const eye = toggle.querySelector(".bi-eye");
-      const eyeSlash = toggle.querySelector(".bi-eye-slash");
+      const icons = toggle.querySelectorAll(".password-eye-icon");
       toggle.addEventListener("click", () => {
         const show = input.type === "password";
         input.type = show ? "text" : "password";
         toggle.setAttribute("aria-label", show ? "Ocultar contraseña" : "Mostrar contraseña");
-        eye.hidden = show;
-        eyeSlash.hidden = !show;
+        icons[0].hidden = show;
+        icons[1].hidden = !show;
       });
     });
     const validate = () => {
@@ -126,7 +125,7 @@
     const valueOr = value => value ? String(value) : "No especificado";
     list.replaceChildren(...orders.map(order => {
       const card = document.createElement("article"); card.className = "account-order-card";
-      const heading = document.createElement("h3"); heading.textContent = "Pedido " + order.id;
+      const heading = document.createElement("h3"); heading.textContent = "Pedido " + window.PanelaStore.formatOrderNumber(order.public_number);
       const date = document.createElement("p"), parsedDate = new Date(order.created_at);
       date.textContent = Number.isNaN(parsedDate.getTime()) ? "Fecha no disponible" : parsedDate.toLocaleString("es-EC", { dateStyle:"medium", timeStyle:"short" });
       const seller = document.createElement("p"); seller.textContent = "Vendedor: Panela San Marcos · 097 950 9568 · imporparaiso@gmail.com";
@@ -146,7 +145,7 @@
         const feedback=document.createElement("p"); feedback.className="account-order-feedback"; feedback.setAttribute("role","status"); feedback.setAttribute("aria-live","polite");
         cancel.addEventListener("click",async()=>{
           if(order.status!=="PENDIENTE")return;
-          if(!window.confirm("¿Cancelar el pedido "+order.id+"? Se detendrá su preparación si sigue pendiente y se restaurará el inventario. Esta acción no se puede deshacer."))return;
+          if(!window.confirm("¿Cancelar el pedido "+window.PanelaStore.formatOrderNumber(order.public_number)+"? Se detendrá su preparación si sigue pendiente y se restaurará el inventario. Esta acción no se puede deshacer."))return;
           cancel.disabled=true; cancel.setAttribute("aria-busy","true"); feedback.textContent="Solicitando cancelación…";
           try {
             const response=await window.supabaseClient.rpc("cancel_order",{p_order_id:order.id});

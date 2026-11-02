@@ -3187,3 +3187,13 @@ select:focus-visible {
         transition-duration: .01ms !important;
     }
 }
+
+.password-toggle .password-eye-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
