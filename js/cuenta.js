@@ -74,16 +74,24 @@
                 return;
             }
             recoveryButton.disabled = true;
-            const redirectTo = `${window.location.origin}${window.location.pathname.replace(/login\.html$/, "cuenta.html")}?recovery=1`;
-            const { error } = await window.supabaseClient.auth.resetPasswordForEmail(emailInput.value.trim(), { redirectTo });
-            recoveryButton.disabled = false;
-            feedback.textContent = error ? "No se pudo enviar el enlace de recuperación. Inténtalo más tarde." : "Si el correo corresponde a una cuenta, recibirás instrucciones para restablecer la contraseña.";
+            const redirectTo = new URL("recuperar.html", window.location.href).toString();
+            try {
+                const { error } = await window.supabaseClient.auth.resetPasswordForEmail(emailInput.value.trim(), { redirectTo });
+                feedback.textContent = error ? "No se pudo enviar el enlace de recuperación. Inténtalo más tarde." : "Si el correo corresponde a una cuenta, recibirás instrucciones para restablecer la contraseña.";
+            } catch {
+                feedback.textContent = "No se pudo enviar el enlace de recuperación. Revisa tu conexión e inténtalo de nuevo.";
+            } finally {
+                recoveryButton.disabled = false;
+            }
         });
 
         if (registerLink && returnTo !== "index.html") registerLink.href = `registro.html?return=${encodeURIComponent(returnTo)}`;
 
         if (parameters.get("registered") === "1") {
             feedback.textContent = "Cuenta creada correctamente. Inicia sesión para continuar.";
+        }
+        if (parameters.get("password_updated") === "1") {
+            feedback.textContent = "Contraseña actualizada. Inicia sesión con tu nueva contraseña.";
         }
 
         bindErrorClearing(loginForm);
