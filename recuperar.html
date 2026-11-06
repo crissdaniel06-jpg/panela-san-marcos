@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6b1f36">
+  <title>Restablecer contraseña | Panela San Marcos</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+  <header class="site-header"><div class="container header-container">
+    <a href="index.html" class="logo" aria-label="Panela San Marcos - Inicio"><img src="img/logo-panela-san-marcos.png" alt="Panela San Marcos"></a>
+    <nav class="main-nav" aria-label="Navegación principal"><ul><li><a href="index.html">Inicio</a></li><li><a href="productos.html">Productos</a></li></ul></nav>
+  </div></header>
+  <main id="main-content">
+    <section class="page-intro"><div class="container"><span class="section-tag">SEGURIDAD DE TU CUENTA</span><h1>Restablecer contraseña</h1></div></section>
+    <section class="container account-page" aria-labelledby="reset-title">
+      <form id="recovery-form" class="account-form" novalidate>
+        <h2 id="reset-title">Crea una contraseña nueva</h2>
+        <p>El enlace de recuperación es temporal y solo se puede usar una vez.</p>
+        <div class="form-field"><label for="recovery-password">Nueva contraseña</label><input id="recovery-password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="recovery-password-error"></div>
+        <span class="field-error" id="recovery-password-error"></span>
+        <div class="form-field"><label for="recovery-confirm">Confirma la nueva contraseña</label><input id="recovery-confirm" type="password" autocomplete="new-password" minlength="8" required aria-describedby="recovery-confirm-error"></div>
+        <span class="field-error" id="recovery-confirm-error"></span>
+        <p class="account-feedback" id="recovery-feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+        <button id="recovery-submit" type="submit" class="action-button action-button-full">Guardar contraseña</button>
+        <p class="account-switch"><a href="login.html">Volver a iniciar sesión</a></p>
+      </form>
+      <aside id="recovery-demo" class="account-feedback" hidden>Vista de prueba local. No se envían correos ni se cambia una contraseña real.</aside>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container footer-container"><p>Panela San Marcos · Pacto, Ecuador</p><p><a href="ayuda.html">Ayuda</a></p><p class="footer-copyright">© 2026 Panela San Marcos</p></div></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/recuperar.js"></script>
+</body>
+</html>
